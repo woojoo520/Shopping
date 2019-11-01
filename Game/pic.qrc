@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/new/BUPT">
+        <file>pic/BUPT.jpg</file>
+        <file>pic/BUPT2.png</file>
+        <file>pic/BUPT3.png</file>
+    </qresource>
+</RCC>

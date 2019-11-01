@@ -14,69 +14,17 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QPushButton" name="priceBtn">
-    <property name="geometry">
-     <rect>
-      <x>410</x>
-      <y>150</y>
-      <width>71</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>按价格</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="newBtn">
-    <property name="geometry">
-     <rect>
-      <x>540</x>
-      <y>150</y>
-      <width>71</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>按新旧</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="chooseBtn">
-    <property name="geometry">
-     <rect>
-      <x>680</x>
-      <y>150</y>
-      <width>71</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>筛选</string>
-    </property>
-   </widget>
    <widget class="QLabel" name="pic_label">
     <property name="geometry">
      <rect>
-      <x>50</x>
-      <y>70</y>
-      <width>251</width>
-      <height>111</height>
+      <x>70</x>
+      <y>60</y>
+      <width>321</width>
+      <height>121</height>
      </rect>
     </property>
     <property name="text">
      <string>Pic</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="productLabel">
-    <property name="geometry">
-     <rect>
-      <x>250</x>
-      <y>230</y>
-      <width>501</width>
-      <height>391</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>used to show product</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="searchEdit">
@@ -108,33 +56,7 @@
      <string>Search</string>
     </property>
    </widget>
-   <widget class="QWidget" name="">
-    <property name="geometry">
-     <rect>
-      <x>680</x>
-      <y>10</y>
-      <width>111</width>
-      <height>71</height>
-     </rect>
-    </property>
-    <layout class="QVBoxLayout" name="verticalLayout_4" stretch="1,0">
-     <item>
-      <widget class="QLabel" name="userName_label">
-       <property name="text">
-        <string>UserName</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLabel" name="imgLabel">
-       <property name="text">
-        <string>头像</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>30</x>
@@ -186,12 +108,12 @@
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>230</x>
       <y>670</y>
-      <width>521</width>
+      <width>532</width>
       <height>51</height>
      </rect>
     </property>
@@ -228,6 +150,88 @@
       </widget>
      </item>
     </layout>
+   </widget>
+   <widget class="QComboBox" name="priceBox">
+    <property name="geometry">
+     <rect>
+      <x>410</x>
+      <y>150</y>
+      <width>111</width>
+      <height>31</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="newBox">
+    <property name="geometry">
+     <rect>
+      <x>530</x>
+      <y>150</y>
+      <width>111</width>
+      <height>31</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="chooseBox">
+    <property name="geometry">
+     <rect>
+      <x>650</x>
+      <y>150</y>
+      <width>101</width>
+      <height>31</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QScrollArea" name="showArea">
+    <property name="geometry">
+     <rect>
+      <x>219</x>
+      <y>229</y>
+      <width>541</width>
+      <height>401</height>
+     </rect>
+    </property>
+    <property name="widgetResizable">
+     <bool>true</bool>
+    </property>
+    <widget class="QWidget" name="scrollAreaWidgetContents">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>539</width>
+       <height>399</height>
+      </rect>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QLabel" name="userName_label">
+    <property name="geometry">
+     <rect>
+      <x>680</x>
+      <y>60</y>
+      <width>91</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="LogonBtn">
+    <property name="geometry">
+     <rect>
+      <x>590</x>
+      <y>30</y>
+      <width>91</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>登录</string>
+    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">

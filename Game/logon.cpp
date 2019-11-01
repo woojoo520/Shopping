@@ -7,7 +7,7 @@ LogOn::LogOn(QWidget *parent) :
     ui(new Ui::LogOn)
 {
     ui->setupUi(this);
-
+    ui->User_pwd->setEchoMode(QLineEdit::Password);
 }
 
 LogOn::~LogOn()
@@ -19,36 +19,22 @@ LogOn::~LogOn()
 
 void LogOn::on_LogOn_Btn_clicked()
 {
-    QString name = ui->User_Name->text();
-    QString pwd = ui->User_pwd->text();
-    if(name == NULL || pwd == NULL) {
-        QMessageBox::warning(this, "Warning", "Please input the complete infomation");
-    } else {
-        QString str = QString("SELECT * FROM Info WHERE User_name = '%1' AND USer_pwd = '%2'").arg(name, pwd);
-        QSqlQuery query;
-        query.exec(str);
-        QString user;
-        while(query.next()) {
-            user = query.value(0).toString();
-        }
-        if(user == NULL) {
-            QMessageBox::warning(this, "Warning", "Sorry, your password is wrong");
-        } else {
-            QMessageBox::warning(this, "OK", "LogOn Successful!");
-        }
-        ui->User_Name->clear();
-        ui->User_pwd->clear();
-    }
+    QVector<QString> infoVec;
+    infoVec.push_back(ui->User_Name->text());
+    infoVec.push_back(ui->User_pwd->text());
+    emit sendLogOnInfo(infoVec);
 }
 
 void LogOn::on_Register_Btn_clicked()
 {
+    needRegister();
+    /*
     QString name = ui->User_Name->text();
     QString pwd = ui->User_pwd->text();
     if(name == NULL || pwd == NULL) {
         QMessageBox::warning(this, "Warning", "Please input the complete infomation");
     } else {
-        QString str = QString("SELECT * FROM Info WHERE User_name = '%1'").arg(name);
+        QString str = QString("SELECT * FROM UserInfo WHERE User_name = '%1'").arg(name);
         QSqlQuery query;
         query.exec(str);
         QString user;
@@ -56,7 +42,7 @@ void LogOn::on_Register_Btn_clicked()
             user = query.value(0).toString();
         }
         if(user == NULL) {
-            query.prepare("INSERT INTO Info(User_name, User_pwd) VALUES (:Name, :Pwd)");
+            query.prepare("INSERT INTO UserInfo(User_name, User_pwd) VALUES (:Name, :Pwd)");
             query.bindValue(":Name", name);
             query.bindValue(":Pwd", pwd);
             if(!query.exec()) {
@@ -70,4 +56,5 @@ void LogOn::on_Register_Btn_clicked()
         ui->User_Name->clear();
         ui->User_pwd->clear();
     }
+    */
 }

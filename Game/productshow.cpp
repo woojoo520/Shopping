@@ -6,9 +6,11 @@ productShow::productShow(QWidget *parent) :
     ui(new Ui::productShow)
 {
     ui->setupUi(this);
+
 }
 
 productShow::~productShow()
 {
     delete ui;
 }
+
