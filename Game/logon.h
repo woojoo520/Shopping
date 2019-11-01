@@ -18,12 +18,13 @@ class LogOn : public QDialog
 public:
     explicit LogOn(QWidget *parent = 0);
     ~LogOn();
+signals:
+    void logOnSucc();
+    void needRegister();
+    void sendLogOnInfo(QVector<QString> InfoVec);
 
 private slots:
-    void on_OKbtn_clicked(bool checked);
-
     void on_LogOn_Btn_clicked();
-
     void on_Register_Btn_clicked();
 
 private:

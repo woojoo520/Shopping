@@ -27,19 +27,30 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    opendb.cpp \
     logon.cpp \
     mydialog.cpp \
-    productshow.cpp
+    productshow.cpp \
+    product.cpp \
+    mylabel.cpp \
+    register.cpp \
+    db.cpp
 
 HEADERS += \
         mainwindow.h \
     logon.h \
     mydialog.h \
-    productshow.h
+    productshow.h \
+    product.h \
+    mylabel.h \
+    register.h \
+    db.h
 
 FORMS += \
         mainwindow.ui \
     logon.ui \
     mydialog.ui \
-    productshow.ui
+    productshow.ui \
+    register.ui
+
+RESOURCES += \
+    pic.qrc
