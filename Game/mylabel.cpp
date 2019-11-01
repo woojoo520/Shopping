@@ -8,7 +8,7 @@ Mylabel::Mylabel(const QString & text,QWidget* parent)
      this->setText(text);
      connect(this, SIGNAL(clicked()), this, SLOT(showDetail()));
 }
-
+ 
 void Mylabel::showDetail()
 {
     productShow *productshow = new productShow();
