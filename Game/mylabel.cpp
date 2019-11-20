@@ -2,19 +2,22 @@
 #include"MYLABEL.h"
 #include"mainwindow.h"
 
-Mylabel::Mylabel(const QString & text,QWidget* parent)
+Mylabel::Mylabel(const QString & text,QWidget* parent, QString productId)
     :QLabel(parent)
 {
-     this->setText(text);
-     connect(this, SIGNAL(clicked()), this, SLOT(showDetail()));
+    this->productId = productId;
+    this->setText(text);
+    connect(&lineEdit, SIGNAL(textChanged(QString)), this, SLOT(showComment()));
+    lineEdit.setText("true");
 }
- 
-void Mylabel::showDetail()
-{
-    productShow *productshow = new productShow();
-    productshow->show();
+
+
+void Mylabel::showComment() {
+    emit showC(this->commentInfo);
 }
+
 void Mylabel::mousePressEvent(QMouseEvent* event)
 {
-    emit clicked();
+    emit clicked(tag, productId);
 }
+

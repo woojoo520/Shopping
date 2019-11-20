@@ -6,6 +6,7 @@
 
 QT       += core gui
 QT       += sql
+QT       += network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -30,27 +31,33 @@ SOURCES += \
     logon.cpp \
     mydialog.cpp \
     productshow.cpp \
-    product.cpp \
     mylabel.cpp \
     register.cpp \
-    db.cpp
+    message.cpp \
+    comment.cpp \
+    product.cpp \
+    mybutton.cpp
 
 HEADERS += \
         mainwindow.h \
     logon.h \
     mydialog.h \
     productshow.h \
-    product.h \
     mylabel.h \
     register.h \
-    db.h
+    message.h \
+    comment.h \
+    product.h \
+    mybutton.h
 
 FORMS += \
         mainwindow.ui \
     logon.ui \
     mydialog.ui \
     productshow.ui \
-    register.ui
+    register.ui \
+    message.ui \
+    comment.ui
 
 RESOURCES += \
     pic.qrc

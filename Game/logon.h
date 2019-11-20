@@ -7,6 +7,7 @@
 #include <QSql>
 #include <QSqlQuery>
 #include <QDebug>
+#include <QJsonObject>
 namespace Ui {
 class LogOn;
 }
@@ -21,7 +22,7 @@ public:
 signals:
     void logOnSucc();
     void needRegister();
-    void sendLogOnInfo(QVector<QString> InfoVec);
+    void sendLogOnInfo(QJsonObject Infojson);
 
 private slots:
     void on_LogOn_Btn_clicked();
