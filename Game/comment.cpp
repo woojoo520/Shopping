@@ -2,6 +2,7 @@
 #include "ui_comment.h"
 
 comment::comment(QWidget *parent,int labelId, QString productId) :
+    QDialog(parent),
     ui(new Ui::comment)
 {
     ui->setupUi(this);
