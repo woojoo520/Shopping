@@ -6,6 +6,7 @@
 #include <QVector>
 #include <QDebug>
 #include <QFileDialog>
+#include <QJsonObject>
 #include <QDateTime>
 #include <QMessageBox>
 #include <QScreen>
@@ -22,12 +23,12 @@ class Register : public QDialog
 public:
     explicit Register(QWidget *parent = 0);
     ~Register();
+    void SaveImg();
 signals:
-    void sendInfo(QVector<QString> InfoVec);
-    void ImgSrcSignal(QVector<QString> InfoVec);
+    void sendInfo(QJsonObject infoJason);
+    void ImgSrcSignal(QJsonObject InfoVec);
 public slots:
     QVector<QString> getInfoMation();
-    void SaveImg();
 private slots:
     void on_registerBtn_clicked();
     void on_logoBtn_clicked();

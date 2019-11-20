@@ -19,10 +19,13 @@ LogOn::~LogOn()
 
 void LogOn::on_LogOn_Btn_clicked()
 {
-    QVector<QString> infoVec;
-    infoVec.push_back(ui->User_Name->text());
-    infoVec.push_back(ui->User_pwd->text());
-    emit sendLogOnInfo(infoVec);
+    QJsonObject Infojson;
+    Infojson["type"] = "isLogon";
+    Infojson["User_name"] = ui->User_Name->text();
+    Infojson["User_pwd"] = ui->User_pwd->text();
+//    infoVec.push_back(ui->User_Name->text());
+//    infoVec.push_back(ui->User_pwd->text());
+    emit sendLogOnInfo(Infojson);
 }
 
 void LogOn::on_Register_Btn_clicked()

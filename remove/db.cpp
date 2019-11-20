@@ -37,7 +37,7 @@ bool DB::OpenDatabase()
 QVector<Product> DB::searchProductInfo() {
     QVector<Product> productVec;
     QSqlQuery query(db);
-    QString searchStr = "SELECT * FROM Product";
+    QString searchStr = "SELECT * FROM Product ORDER BY popular";
     query.exec(searchStr);
     while(query.next()) {
         Product product;
@@ -63,11 +63,22 @@ QVector<QString> DB::isLogon(QVector<QString> InfoVec) {
         QSqlQuery query(db);
         query.exec(str);
         if(query.next()) {
-            resInfo.push_back("Logon Successfully!");
-            QString usr_logo = query.value(4).toString();
-            QString usr_name = InfoVec[0];
-            resInfo.push_back(usr_name);
-            resInfo.push_back(usr_logo);
+            if(query.value(5).toString() == "1") {
+                resInfo.push_back("Sorry, the user has been signed in!");
+            } else {
+                QSqlQuery query2(db);
+                QString searchStr2 = "UPDATE UserInfo SET isLogon = 1 WHERE user_name = '" + InfoVec[0] + "'";
+//                qDebug() << searchStr2 << endl;
+                bool isSuccess = query2.exec(searchStr2);
+                if(isSuccess) {
+                    resInfo.push_back("Logon Successfully!");
+                    QString usr_logo = query.value(4).toString();
+                    QString usr_name = InfoVec[0];
+                    resInfo.push_back(usr_name);
+                    resInfo.push_back(usr_logo);
+                }
+                resInfo.push_back("Sorry, Logon failed!");
+            }
         } else {
             resInfo.push_back("Sorry, your password is wrong");
         }
@@ -102,7 +113,7 @@ QString DB::UserRegister(QVector<QString> InfoVec) {
         return "Sorry, the user name has been registered";
     }
 //    searchStr = "INSERT INTO UserInfo VALUES(\'%1\', \'%2\', \'%3\', \'%4\')".arg(InfoVec[0], InfoVec[1], InfoVec[2], InfoVec[3]);
-    searchStr = "INSERT INTO UserInfo VALUES( \'" + InfoVec[0] + "\', \'" + InfoVec[1] + "\', \'" + InfoVec[3] + "\', \'" + InfoVec[4]+ "\', \'" + InfoVec[5] + "\', NULL)";
+    searchStr = "INSERT INTO UserInfo VALUES( \'" + InfoVec[0] + "\', \'" + InfoVec[1] + "\', \'" + InfoVec[3] + "\', \'" + InfoVec[4]+ "\', \'" + InfoVec[5] + "\', 0)";
     qDebug() << searchStr;
     bool isSucc = query.exec(searchStr);
     if(!isSucc) {
@@ -112,4 +123,70 @@ QString DB::UserRegister(QVector<QString> InfoVec) {
         emit sendImg();
         return "Register successfully";
     }
+}
+
+void DB::queryResult(QMap<QString, QString> queryInfo) {
+    qDebug() << "queryResult" << endl;
+    QVector<Product> productVec;
+    QSqlQuery query(db);
+    QString priceDesc = queryInfo["priceQuery"] == tr("从低到高") ? "ASC" : "DESC";
+    QString newDesc = queryInfo["newQuery"] == ("从新到旧") ?  "ASC" : "DESC";
+    QString searchStr = "SELECT * FROM Product ";
+    if(queryInfo["searchP"] != "") {
+        searchStr += "WHERE description LIKE '%" + queryInfo["searchP"] + "%' OR tag LIKE '%" + queryInfo["searchP"] + "%'";
+    }else if(queryInfo["catogary"] != "") {
+        searchStr += "WHERE description LIKE '%" + queryInfo["catogary"] + "%' OR tag LIKE '%" + queryInfo["catogary"] + "%'";
+    }
+    searchStr += " ORDER BY price " + priceDesc + ", date " + newDesc + ", popular ASC";
+    qDebug() << searchStr << endl;
+    bool isSucc = query.exec(searchStr);
+    if(!isSucc) {
+        qDebug() << "failed!" << endl;
+        return ;
+    }
+    while(query.next()) {
+        Product product;
+        product.product_id = query.value(0).toString();
+        product.seller_name = query.value(1).toString();
+        product.state = query.value(2).toInt();
+        product.price = query.value(3).toFloat();
+        product.description = query.value(4).toString();
+        product.src = query.value(5).toString();
+        product.tag = query.value(6).toString();
+        productVec.push_back(product);
+    }
+    for(int i = 0;i < productVec.size();i++) {
+        qDebug() << productVec[i].price << endl;
+    }
+    emit sendQueryRes(productVec);
+}
+
+bool DB::logout(QString user_name) {
+    QSqlQuery query(db);
+    QString searchStr = "UPDATE UserInfo SET isLogon = 0 WHERE user_name = '" + user_name + "'";
+    qDebug() << searchStr << endl;
+    bool isSuccess = query.exec(searchStr);
+    if(isSuccess) {
+        return true;
+    }
+    return false;
+}
+
+QVector<QPair<QString, QString>> DB::queryComment(QString ProductId) {
+    QVector<QPair<QString, QString>> res;
+    QSqlQuery query(db);
+    QString searchStr = "SELECT User_name, comment FROM comment WHERE Product_Id = '" + ProductId + "'";
+    qDebug() << searchStr << endl;
+    bool isSuccess = query.exec(searchStr);
+    if(!isSuccess) {
+        qDebug() << "No" << endl;
+        return res;
+    }
+    while(query.next()) {
+        QPair<QString, QString> Info;
+        Info.first = query.value(0).toString();
+        Info.second = query.value(1).toString();
+        res.push_back(Info);
+    }
+    return res;
 }

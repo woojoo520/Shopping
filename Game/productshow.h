@@ -5,8 +5,10 @@
 #include <QVector>
 #include <QString>
 #include <QDebug>
+#include <QJsonArray>
+#include <QJsonObject>
 #include "product.h"
-#include "db.h"
+#include "comment.h"
 
 class DB;
 
@@ -19,12 +21,19 @@ class productShow : public QDialog
     Q_OBJECT
 
 public:
-    explicit productShow(QWidget *parent = 0);
+    explicit productShow(QWidget *parent = 0,int labelID = 0, QString productId = "");
     ~productShow();
-
-
+signals:
+    void getComment(int labelId, QString productId);
+public slots:
+    void Show();
+    void on_commentBtn_clicked();
 private:
     Ui::productShow *ui;
+public:
+    QString ProductId;
+    QPushButton *pushButton;
+    int labelId;
 };
 
 #endif // PRODUCTSHOW_H

@@ -21,14 +21,15 @@ QVector<QString> Register::getInfoMation() {
 
 void Register::on_registerBtn_clicked()
 {
-    QVector<QString> infoVec;
-    infoVec.push_back(ui->User_Name->text());
-    infoVec.push_back(ui->User_pwd->text());
-    infoVec.push_back(ui->resurePwd->text());
-    infoVec.push_back(ui->User_Address->text());
-    infoVec.push_back(ui->User_Phone->text());
-    infoVec.push_back(fileName);
-    emit sendInfo(infoVec);
+    QJsonObject infoJson;
+    infoJson["type"] = "UserRegister";
+    infoJson["User_Name"] = ui->User_Name->text();
+    infoJson["User_pwd"] = ui->User_pwd->text();
+    infoJson["resurePwd"] = ui->resurePwd->text();
+    infoJson["User_Address"] = ui->User_Address->text();
+    infoJson["User_Phone"] = ui->User_Phone->text();
+    infoJson["fileName"] = fileName;
+    emit sendInfo(infoJson);
 }
 
 void Register::on_logoBtn_clicked()
@@ -54,8 +55,9 @@ void Register::SaveImg() {
     QScreen *screen = QGuiApplication::primaryScreen();
     screen->grabWindow(ui->logo_Label->winId()).save(savePath);
     qDebug() << "savePath = " << savePath << endl;
-    QVector<QString> InfoVec;
-    InfoVec.push_back(ui->User_Name->text());
-    InfoVec.push_back(savePath);
-    emit ImgSrcSignal(InfoVec);
+    QJsonObject infoJson;
+    infoJson["type"] = "updateImgSrc";
+    infoJson["User_name"] = ui->User_Name->text();
+    infoJson["savePath"] = savePath;
+    emit ImgSrcSignal(infoJson);
 }
