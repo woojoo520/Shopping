@@ -43,3 +43,7 @@ FORMS += \
     logon.ui \
     mydialog.ui \
     productshow.ui
+
+RESOURCES += \
+    picture.qrc \
+    ../img/bupt.qrc

@@ -15,6 +15,9 @@ public:
     explicit productShow(QWidget *parent = 0);
     ~productShow();
     search();
+private slots:
+    void on_addBtn_clicked();
+    
 private:
     Ui::productShow *ui;
 

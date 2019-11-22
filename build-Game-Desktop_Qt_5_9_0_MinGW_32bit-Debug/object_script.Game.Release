@@ -1,0 +1,13 @@
+INPUT(
+./release\main.o
+./release\mainwindow.o
+./release\logon.o
+./release\mydialog.o
+./release\productshow.o
+./release\qrc_picture.o
+./release\qrc_bupt.o
+./release\moc_mainwindow.o
+./release\moc_logon.o
+./release\moc_mydialog.o
+./release\moc_productshow.o
+);
