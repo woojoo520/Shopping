@@ -1,0 +1,19 @@
+#include "dealthread.h"
+
+dealThread::dealThread(QString str, QTcpSocket* conn)
+{
+    this->str = str;
+    this->conn = conn;
+    this->conn->write(QString("Successfully!!!").toUtf8());
+}
+
+dealThread::~dealThread() {
+    qDebug() << "析构" << endl;
+}
+
+void dealThread::run() {
+    qDebug() << this->str << endl;
+//    this->conn->write(QString("Successfully!!!").toUtf8());
+    qDebug() << "Sending reply" << endl;
+}
+

@@ -7,13 +7,23 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+
+//    conn = new QTcpSocket;
+
     //初始化客户端对象
     socket = new QTcpSocket();
+
+//    connect(socket, &QTcpSocket::readyRead, this, &MainWindow::dataArrived);
+    //关联readyRead和socket_Read_Data槽函数。服务器有数据发送时，会自动触发readyRead信号
+//    connectToHost("127.0.0.1", 23333);
+    connect(socket,&QTcpSocket::readyRead,this,&MainWindow::socket_Read_Data);
+    connect(socket, &QTcpSocket::disconnected, this, &MainWindow::connDisconnected);
+    in.setDevice(socket);
+    in.setVersion(QDataStream::Qt_5_10);
     connect_socket();
 
-    //连接槽信号
-    //关联readyRead和socket_Read_Data槽函数。服务器有数据发送时，会自动触发readyRead信号
-    QObject::connect(socket,&QTcpSocket::readyRead,this,&MainWindow::socket_Read_Data);
+
+
     initDB();
     QImage *logo = new QImage;
     logo->load(":/new/BUPT/pic/BUPT3.png");
@@ -30,6 +40,10 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&logon, SIGNAL(needRegister()), this, SLOT(showRegister()));
     connect(&logon, SIGNAL(sendLogOnInfo(QJsonObject)), this, SLOT(getUserLogon(QJsonObject)));
     connect(&registerW, SIGNAL(ImgSrcSignal(QJsonObject)), this, SLOT(updateImgSrc(QJsonObject)));
+    connect(this, SIGNAL(showRelease()), &release, SLOT(showRelease()));
+    connect(&release, SIGNAL(releasePro(QJsonObject)), this, SLOT(releaseProduct(QJsonObject)));
+    connect(this, SIGNAL(showMsgSignal()), &showmsg, SLOT(showMsg()));
+    connect(&showmsg, SIGNAL(readXmsg(int)), this, SLOT(getMsgIndex(int)));
 /*  查看Qt当前的工作路径，这涉及到UserLogo的保存位置
     QString fileName = QCoreApplication::applicationDirPath();
     qDebug() << fileName << endl;
@@ -41,6 +55,13 @@ MainWindow::MainWindow(QWidget *parent) :
 //            QMessageBox::warning(this, "warning", address.toString());
 //        }
 //    }
+}
+
+void MainWindow::releaseProduct(QJsonObject productInfo) {
+    productInfo["type"] = "releaseProduct";
+    productInfo["seller_name"] = ui->userName_label->text();
+    productInfo["User_name"] = ui->userName_label->text();
+    send_socketInfo(productInfo);
 }
 
 void MainWindow::updateImgSrc(QJsonObject infoJson) {
@@ -64,16 +85,24 @@ void MainWindow::connect_socket()
     //取消所有连接
     socket->abort();
     //连接服务器
-    socket->connectToHost("127.0.0.1",6666);
-    if(!socket->waitForConnected(3000)) {
-        qDebug() << "连接服务器请求失败，请重新操作";
-    } else {
-        qDebug() << "连接服务器成功" << endl;
-        QMessageBox::warning(this,"warning",tr("连接服务器成功"),QMessageBox::Yes,QMessageBox::No);
+    socket->connectToHost("127.0.0.1",23333);
+    while(!socket->waitForConnected(3000)) {
+        QMessageBox::warning(this, "warning", "连接失败");
+        socket->connectToHost("127.0.0.1",23333);
     }
+    QMessageBox::warning(this,"warning",tr("连接服务器成功"),QMessageBox::Yes,QMessageBox::No);
+//    if(!socket->waitForConnected(3000)) {
+//        qDebug() << "连接服务器请求失败，请重新操作";
+//        QMessageBox::warning(this, "warning", "连接失败");
+//    } else {
+//        qDebug() << "连接服务器成功" << endl;
+//        QMessageBox::warning(this,"warning",tr("连接服务器成功"),QMessageBox::Yes,QMessageBox::No);
+//    }
 }
 
-void MainWindow::SaveProductInfo(QJsonArray array) {
+void MainWindow::SaveProductInfo(QJsonArray array, QString type) {
+    ProductInfo.clear();
+    release.releaseProduct.clear();
     for(int i = 0;i < array.size();i++) {
         QJsonObject productJson = array.at(i).toObject();
         Product product;
@@ -84,9 +113,18 @@ void MainWindow::SaveProductInfo(QJsonArray array) {
         product.description = productJson["description"].toString();
         product.src         = productJson["src"].toString();
         product.tag         = productJson["tag"].toString();
-        ProductInfo.push_back(product);
+        if(type == "user") {
+            ProductInfo.push_back(product);
+        } else {
+            release.releaseProduct.push_back(product);
+        }
     }
-    showRecommend();
+    if(type == "user") {
+        showRecommend();
+    } else {
+        emit showRelease();
+    }
+
 }
 
 //读缓冲区槽函数
@@ -95,12 +133,24 @@ void MainWindow::socket_Read_Data() {
     //读取缓冲区数据
     buffer = socket->readAll();
     //显示缓冲区数据
-//    QMessageBox::warning(this, "socket_info", buffer);
     QJsonObject jsonObject = QJsonDocument::fromJson(buffer).object();
+//    ui->textEdit->setText(QString(QJsonDocument(jsonObject).toJson()));
+//    QMessageBox::warning(this, "warning", QString(QJsonDocument(jsonObject).toJson()));
+
     if(jsonObject["type"] == "isLogon") {
         if(jsonObject["warning"].toString() == "Logon Successfully!") {
             // 登录成功后，LogonBtn上需要显示切换用户
             showLogon(jsonObject);
+            if(jsonObject["unreadMsg"].toArray().size() > 0) {
+                QImage *img = new QImage;
+                img->load("E:\\Qt\\Shopping\\Game\\pic\\otherpic\\msg.png");
+                QImage newImg = img->scaled(ui->msg_label->width(), ui->msg_label->height(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+                ui->msg_label->setPixmap(QPixmap::fromImage(newImg));
+                ui->msg_label->show();
+                ui->msg_label->raise();
+                showmsg.unreadMsg = jsonObject["unreadMsg"].toArray();
+            }
+            showmsg.readMsg = jsonObject["readMsg"].toArray();
         } else {
             QMessageBox::warning(this, "warning", jsonObject["warning"].toString());
         }
@@ -108,14 +158,14 @@ void MainWindow::socket_Read_Data() {
     else if(jsonObject["type"] == "searchProductInfo") {
         if(jsonObject["warning"].toString() == "Successfully!") {
             QJsonArray array = jsonObject["array"].toArray();
-            SaveProductInfo(array);
+            SaveProductInfo(array, jsonObject["object"].toString());
         }
     }
     else if (jsonObject["type"] == "queryResult"){
         ProductInfo.clear();
         if(jsonObject["warning"] == "Successfully!") {
             QJsonArray array = jsonObject["array"].toArray();
-            SaveProductInfo(array);
+            SaveProductInfo(array, "user");
         }
     }
     else if(jsonObject["type"] == "logout") {
@@ -148,11 +198,19 @@ void MainWindow::socket_Read_Data() {
         MylabelVec[labelId]->commentInfo = array;
         QString str = MylabelVec[labelId]->lineEdit.text() == "true" ? "false" : "true";
         MylabelVec[labelId]->lineEdit.setText(str);
+    } else if(jsonObject["type"] == "releaseProduct") {
+        if(jsonObject["warning"].toString() == "Successfully!") {
+            SaveProductInfo(jsonObject["array"].toArray(), "seller");
+        }
+    } else if(jsonObject["type"] == "sendMsg") {
+        QMessageBox::warning(this, "warning", jsonObject["Msg"].toString());
+        ui->userName_label->show();
+    } else if(jsonObject["type"] == "getMsg") {
+        showmsg.unreadMsg = jsonObject["unreadMsg"].toArray();
+        showmsg.readMsg = jsonObject["readMsg"].toArray();
+        emit showMsgSignal();
+        showmsg.show();
     }
-}
-
-void MainWindow::socket_Disconnected() {
-
 }
 
 void MainWindow::changeLogOnPic() {
@@ -253,6 +311,13 @@ void MainWindow::sendComment(QJsonObject commentJson) {
     send_socketInfo(commentJson);
 }
 
+void MainWindow::getMsgIndex(int id) {
+    QJsonObject msgJson;
+    msgJson["Id"] = id;
+    msgJson["type"] = "readXMsg";
+    send_socketInfo(msgJson);
+}
+
 void MainWindow::getComment(int labelId, QString productId) {
     QJsonObject InfoJson;
     InfoJson["type"] = "queryComment";
@@ -265,6 +330,7 @@ void MainWindow::getComment(int labelId, QString productId) {
 void MainWindow::getData() {
     QJsonObject Infojson;
     Infojson["type"] = "searchProductInfo";
+    Infojson["object"] = "user";
     send_socketInfo(Infojson);
 }
 
@@ -329,7 +395,19 @@ void MainWindow::showQueryRes(QVector<Product> productRes) {
 
 void MainWindow::on_messageBtn_clicked()
 {
+    // 上面这部分是虚构的，即这部分内容应该写在点击下订单按钮之后，然后将订单消息发送出去，不应该在这部分中处理
+//    QJsonObject query;
+//    query["type"] = "order";
+//    query["user_name"] = ui->userName_label->text();
+//    query["SellerName"] = "ZJY";
+//    query["Msg"] = "Hello, I am ZJY";
+//    send_socketInfo(query);
 
+   ui->msg_label->hide();
+   QJsonObject getMsgObj;
+   getMsgObj["type"] = "getMsg";
+   getMsgObj["User_name"] = ui->userName_label->text();
+   send_socketInfo(getMsgObj);
 }
 
 void MainWindow::on_MyBtn_clicked()
@@ -339,7 +417,17 @@ void MainWindow::on_MyBtn_clicked()
 
 void MainWindow::on_releaseBtn_clicked()
 {
-
+    if(ui->userName_label->text() == "") {
+        QMessageBox::warning(this, "warning", "Please logon first!");
+        logon.show();
+        return ;
+    }
+    QJsonObject releaseInfo;
+    releaseInfo["type"] = "searchProductInfo";
+    releaseInfo["object"] = "seller";
+    releaseInfo["User_name"] = ui->userName_label->text();
+    send_socketInfo(releaseInfo);
+    release.show();
 }
 
 void MainWindow::on_firstPageBtn_clicked()
@@ -389,3 +477,13 @@ void MainWindow::getRegisterInfo(QJsonObject infoJson) {
     send_socketInfo(infoJson);
 }
 
+void MainWindow::connectToHost(const QString &hostName, quint16 port) {
+    socket->connectToHost(hostName, port);
+}
+
+void MainWindow::connDisconnected() {
+    dataQ.clear();
+//    ui->textEdit->setText("链接丢失");
+    QMessageBox::warning(this, "warning", "Disconnect");
+    connect_socket();
+}

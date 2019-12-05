@@ -36,7 +36,10 @@ SOURCES += \
     message.cpp \
     comment.cpp \
     product.cpp \
-    mybutton.cpp
+    mybutton.cpp \
+    release.cpp \
+    showmessage.cpp \
+    msgbutton.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -48,7 +51,10 @@ HEADERS += \
     message.h \
     comment.h \
     product.h \
-    mybutton.h
+    release.h \
+    showmessage.h \
+    mybutton.h \
+    msgbutton.h
 
 FORMS += \
         mainwindow.ui \
@@ -57,7 +63,9 @@ FORMS += \
     productshow.ui \
     register.ui \
     message.ui \
-    comment.ui
+    comment.ui \
+    release.ui \
+    showmessage.ui
 
 RESOURCES += \
     pic.qrc

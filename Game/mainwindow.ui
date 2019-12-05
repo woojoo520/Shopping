@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>800</width>
-    <height>800</height>
+    <height>1000</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -108,49 +108,6 @@
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="layoutWidget">
-    <property name="geometry">
-     <rect>
-      <x>230</x>
-      <y>670</y>
-      <width>532</width>
-      <height>51</height>
-     </rect>
-    </property>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <property name="spacing">
-      <number>70</number>
-     </property>
-     <item>
-      <widget class="QPushButton" name="firstPageBtn">
-       <property name="text">
-        <string>首页</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="releaseBtn">
-       <property name="text">
-        <string>发布</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="messageBtn">
-       <property name="text">
-        <string>消息</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="MyBtn">
-       <property name="text">
-        <string>我的</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
    <widget class="QComboBox" name="priceBox">
     <property name="geometry">
      <rect>
@@ -207,8 +164,8 @@
    <widget class="QLabel" name="userName_label">
     <property name="geometry">
      <rect>
-      <x>680</x>
-      <y>70</y>
+      <x>700</x>
+      <y>80</y>
       <width>91</width>
       <height>21</height>
      </rect>
@@ -244,6 +201,81 @@
     </property>
     <property name="text">
      <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="msg_label">
+    <property name="geometry">
+     <rect>
+      <x>590</x>
+      <y>660</y>
+      <width>20</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="firstPageBtn">
+    <property name="geometry">
+     <rect>
+      <x>231</x>
+      <y>673</y>
+      <width>80</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>首页</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="messageBtn">
+    <property name="geometry">
+     <rect>
+      <x>530</x>
+      <y>670</y>
+      <width>80</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>消息</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="MyBtn">
+    <property name="geometry">
+     <rect>
+      <x>680</x>
+      <y>670</y>
+      <width>80</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>我的</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="releaseBtn">
+    <property name="geometry">
+     <rect>
+      <x>379</x>
+      <y>673</y>
+      <width>80</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>发布</string>
+    </property>
+   </widget>
+   <widget class="QTextEdit" name="textEdit">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>720</y>
+      <width>761</width>
+      <height>211</height>
+     </rect>
     </property>
    </widget>
   </widget>

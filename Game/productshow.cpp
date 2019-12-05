@@ -12,6 +12,7 @@ productShow::productShow(QWidget *parent,int labelID, QString productId) :
     pushButton->setText(tr("评价"));
     pushButton->setGeometry(100, 510, 80, 31);
     pushButton->show();
+//    connect(pushButton, SIGNAL(clicked(bool)), this, SLOT(on_commentBtn_clicked()));
 }
 
 productShow::~productShow()

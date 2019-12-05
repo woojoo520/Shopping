@@ -1,0 +1,13 @@
+INPUT(
+./debug\main.o
+./debug\mainwindow.o
+./debug\logon.o
+./debug\ordershow.o
+./debug\releaseproduct.o
+./debug\register.o
+./debug\moc_mainwindow.o
+./debug\moc_logon.o
+./debug\moc_ordershow.o
+./debug\moc_releaseproduct.o
+./debug\moc_register.o
+);
