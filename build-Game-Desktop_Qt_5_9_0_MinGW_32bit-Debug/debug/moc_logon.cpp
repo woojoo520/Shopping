@@ -76,8 +76,9 @@ void LogOn::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void 
         LogOn *_t = static_cast<LogOn *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
-        case 0: _t->on_LogOn_Btn_clicked(); break;
-        case 1: _t->on_Register_Btn_clicked(); break;
+        case 0: _t->on_OKbtn_clicked((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 1: _t->on_LogOn_Btn_clicked(); break;
+        case 2: _t->on_Register_Btn_clicked(); break;
         default: ;
         }
     }
