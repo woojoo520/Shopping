@@ -1,6 +1,13 @@
 #include "comment.h"
 #include "ui_comment.h"
 
+/*!
+ * initialize paramenters
+ * 
+ * complete the initialization of lableId, productId in the constructor. For the comment is for one of the items
+ * @param labelId the index of the shown lobel in mainWindow
+ * @param productId the Id of the product 
+ */
 comment::comment(QWidget *parent,int labelId, QString productId) :
     QDialog(parent),
     ui(new Ui::comment)
@@ -15,6 +22,12 @@ comment::~comment()
     delete ui;
 }
 
+/**
+ * finishing the function of commenting
+ * 
+ * It is a dlot function, which is aroused when the button is clicked. 
+ * And get the information of the productId and labelId user comment, the comment info
+ */
 void comment::on_pushButton_clicked()
 {
     QJsonObject commentJson;
@@ -25,6 +38,13 @@ void comment::on_pushButton_clicked()
     emit sendComment(commentJson);
 }
 
+/**
+ * show the comment in GUI
+ * 
+ * get the infomation of the comment, including the content, the length, user's name and the popularity of the comments, the productId, labelId, src of the image of the product 
+ * create a layout to place these items
+ * create a button for every comment for uses to give the thumbs-up, and bounded the click signals of the button to the slot function of praise()
+ */
 void comment::showComment(QJsonArray commentInfo) {
     popularVec.clear();
     ui->myComment->clear();
@@ -63,6 +83,7 @@ void comment::showComment(QJsonArray commentInfo) {
         row += qMax(2, length / 15);
     }
 
+    /**> for it may be to small comment of the product, it may change the layout of the product, and you can't get the ideal layout */
     if(commentInfo.size() < 4) {
         for(int i = 4 - commentInfo.size(); i >= 0;i--) {
             QLabel *labelComment = new QLabel(this);
@@ -76,6 +97,12 @@ void comment::showComment(QJsonArray commentInfo) {
     ui->scrollArea->setWidget(containWidget);
 }
 
+/**
+ * approval function
+ * when you are interested in one of the comments, you can clocked the "thumb" button, and then will trigger the slot funciton
+ * it will get the information of the product and the information of the user, and change the popularity of the product in the database
+ * the most important thing is to implement the function taht yyou can't approval for second time, that is, if you clicked the same button, it will default to cancel the "likes", and it will decrease the number of likes 
+ */
 void comment::praise(int id, int labelId, int seq, QString ProductId, bool isadd) {
     QJsonObject praiseJson;
     praiseJson["type"] = "praise";
@@ -92,6 +119,9 @@ void comment::praise(int id, int labelId, int seq, QString ProductId, bool isadd
     emit sendPraise(praiseJson);
 }
 
+/**
+ * send a signal of getting the comment information
+ */
 void comment::Show() {
     this->show();
     emit queryComment(this->labelId, this->ProductId);

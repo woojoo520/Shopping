@@ -1,6 +1,12 @@
 #ifndef SHOWMESSAGE_H
 #define SHOWMESSAGE_H
-
+/**
+ * @file
+ * @brief   Display the information received by the user
+ * @author  MengYeqing
+ * @date    2019/12/6
+ * @note
+ */
 #include <QDialog>
 #include <QGridLayout>
 #include <QDebug>

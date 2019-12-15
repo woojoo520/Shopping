@@ -1,6 +1,13 @@
 #ifndef REGISTER_H
 #define REGISTER_H
 
+/**
+ * @file
+ * @brief   User registration function
+ * @author  MengYeqing
+ * @date    2019/11/24
+ * @note 
+ */
 #include <QDialog>
 #include <QString>
 #include <QVector>

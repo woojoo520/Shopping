@@ -1,6 +1,16 @@
 #ifndef DEALMSG_H
 #define DEALMSG_H
 
+/**
+ * @file dealmsg.h
+ * @author Meng Yeqing
+ * @brief 
+ * @version 0.1
+ * @date 2019-12-15
+ * 
+ * @copyright Copyright (c) 2019
+ * 
+ */
 #include <QThread>
 #include <QString>
 #include <QtNetwork>

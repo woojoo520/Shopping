@@ -1,5 +1,11 @@
 #include "dealthread.h"
 
+/**
+ * @brief Construct a new deal Thread::deal Thread object
+ * 
+ * @param Info 
+ * @param conn 
+ */
 dealThread::dealThread(QJsonObject Info, QTcpSocket* conn)
 {
     this->conn = conn;
@@ -11,14 +17,27 @@ dealThread::dealThread(QJsonObject Info, QTcpSocket* conn)
     this->conn->write(sendInfo);
 }
 
+/**
+ * @brief Destroy the deal Thread::deal Thread object
+ * 
+ */
 dealThread::~dealThread() {
     qDebug() << "析构" << endl;
 }
 
+/**
+ * @brief run a thread
+ * 
+ */
 void dealThread::run() {
     qDebug() << "Sending reply" << endl;
 }
 
+/**
+ * @brief Process the information sent from the client, and call different functions to process according to the information in the type field
+ * 
+ * @param Info 
+ */
 void dealThread::dealWithMsg(QJsonObject Info) {
     QJsonObject infoJson;
     infoJson["type"] = Info["type"];
@@ -122,8 +141,10 @@ void dealThread::dealWithMsg(QJsonObject Info) {
         sendInfo = QJsonDocument(infoJson).toJson();
     } else if(Info["type"] == "readXMsg") {
         db.changeUnreadToRead(Info);
+    } else if(Info["type"] == "productShowMsg") {
+        QJsonObject infoJson = db.productShowMsg(Info);
+        sendInfo = QJsonDocument(infoJson).toJson();
     }
-
 
 }
 

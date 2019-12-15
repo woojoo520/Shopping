@@ -1,6 +1,9 @@
 #include "release.h"
 #include "ui_release.h"
 
+/**
+ * @brief   Initialization interface
+ */
 Release::Release(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::Release)
@@ -8,6 +11,9 @@ Release::Release(QWidget *parent) :
     ui->setupUi(this);
 }
 
+/**
+ * @brief   Layout, showing all product information published by the user
+ */
 void Release::showRelease() {
     QGridLayout *layout = new QGridLayout;
     QWidget *containWidget = new QWidget;
@@ -46,11 +52,18 @@ void Release::showRelease() {
 
 }
 
+/**
+ * @brief   delete the ui 
+ */
 Release::~Release()
 {
     delete ui;
 }
 
+/**
+ * @brief   release a product 
+ * When you click the release button, you can get all the information of the product, including the price, picture, description information, label, remaining quantity and so on, and then emit a signal to MainWindow to pass the information to server
+ */
 void Release::on_releaseBtn_clicked()
 {
     QJsonObject productInfo;
@@ -72,6 +85,9 @@ void Release::on_releaseBtn_clicked()
     emit releasePro(productInfo);
 }
 
+/**
+ * @brief   Get product picture information in the local folder
+ */
 void Release::on_chooseBtn_clicked()
 {
     fileName = QFileDialog::getOpenFileName(

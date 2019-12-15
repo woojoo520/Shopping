@@ -1,6 +1,13 @@
 #ifndef MSGBUTTON_H
 #define MSGBUTTON_H
 
+/**
+ * @file
+ * @brief show the read and unread order message to the user
+ * @author MengYeqing
+ * @date 2019/12/01
+ * @note
+ */
 #include <QObject>
 #include <QPushButton>
 #include <QIcon>

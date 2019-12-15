@@ -1,6 +1,12 @@
 #ifndef MYBUTTON_H
 #define MYBUTTON_H
-
+/**
+ * @file
+ * @brief implement the function of comment praise
+ * @author MengYeqing
+ * @date 2019/12/2
+ * @note
+ */
 #include <QObject>
 #include <QPushButton>
 #include <QIcon>

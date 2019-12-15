@@ -1,0 +1,107 @@
+Qt的注释类型：
+/*!
+ * ...注释
+ *
+ */
+
+单行类型的注释：
+/// ...注释...
+//! ...注释...
+
+不同类型的注释可以混合使用
+
+Doxygen产生说明文档时，Doxegen会首先解析程序源代码，并且依据程序的结构建立对应的文档，然后再将代码中的注释及其在程序中的位置放在文档中正确的地方。除了一般文字说明外，Doxygen还有一些其他特别的指令。如@param及@return等。Doxygen根据这些指令判断这些注释是函数参数还是返回值
+
+Doxygen对文件的注释
+/**
+    *\file myfile.c
+    *
+    *\brief 文件建议说明
+    *
+    *   详细说明
+    *
+    *\author 作者信息
+    */
+
+\file会告诉Doxygen此处是源码文件的注释，\brief表明此处是文件的简易说明，\author表示是作者的信息
+
+对函数说明的注释如下：
+/**
+ * Function 的简易说明
+ * Function 的详细说明
+ * @param a 用来相加的参数
+ * @param b 用来相加的参数
+ * @return 传回两个参数相加的结果
+ */
+int Function(int a, char b) {
+    return (a + b);
+}
+
+在Doxygen处理一个函数注释是，会先判断第一行为简易说明。这个简易说明将一直到空一行的出现，或是遇到第一个'.'为止。之后的注释会被视为详细说明。@param表示是函数参数说明。'@'和'\'在Doxygen中是一样的，都是告诉Doxygen后面是一个指令
+
+Doxygen中常用指令的说明：
+@file       源码文件的注释说明
+@author     作者的信息
+@brief      用于class或function的注释
+@param      格式为@param arg_name 参数说明。主要用于函数说明中，后面接参数的名字，然后再接关于该参数的说明
+@return     后接函数传回值的说明。用于function的注释中，说明该函数的传回值
+@retval     格式为@return value 传回值说明。描述返回值类型.主要用于函数说明中，说明特定传回值的意义。所以后面要先接一个日传回值，然后在放该传回值的说明
+@note       注释
+@attention  注意
+@warning    警告信息
+@var        引用了某个变量，Doxygen会在该枚举处产生一个链接. eg: @var CTest:m_FileKey
+@class      引用某个类，格式 @class<name>[<header-file>][<header-name>], eg: @class CTest "inc/class.h"
+@exception  可能产生的异常描述。@exception 本函数执行可能会产生超出范围的异常   
+
+样例：
+/**
+ * @file example.c
+ * @brief 文件简要说明
+ * 
+ * 详细说明
+ * 
+ * @author 作者信息
+ */
+#define EXAMPLE_OK 0    /**< 注释EXAMPLE_OK*/
+
+/** 
+ * @brief 结构体简要说明
+ */
+typedef struct
+{
+    int menber1;    /**< 注释member1 */
+    ...
+}STRUCT_T;
+
+/** 
+ * Function1()的简要说明 
+ * Function2()的简要说明
+ * @param a 用来相加的参数
+ * @param b 用来相加的参数
+ * @return 传回两个参数相加的结果
+ */
+int Function1(int a, char b) {
+    return (a + b);
+}
+
+/**
+ * Function2()的简要说明
+ * 
+ * @param c 传进的字符指针
+ * @retval NULL 空字符串
+ * @retval !NULL 非空字符串
+ */
+char *Function2(char *c) {
+    return c;
+}
+
+宏定义注释
+/** Description of the macro */
+#define XXXX_XXX_XX     0x7fffffff
+或者
+#define XXXX_XXX_XX     0   ///< Description of the macro.
+
+全局和静态变量注释
+/** Description of global variable */
+int g_xxx = 0;
+static int s_xxx = 0;   ///< Description of static variable 

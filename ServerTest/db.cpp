@@ -1,10 +1,20 @@
 #include "db.h"
 
+/**
+ * @brief Construct a new DB::DB object
+ * open the database
+ * @param parent 
+ */
 DB::DB(QObject *parent) : QObject(parent)
 {
     OpenDatabase();
 }
-
+/**
+ * @brief open the database
+ * Connect to database according to account password
+ * @return true 
+ * @return false 
+ */
 bool DB::OpenDatabase()
 {
     db = QSqlDatabase::addDatabase("QODBC");   //数据库驱动类型为SQL Server
@@ -34,6 +44,39 @@ bool DB::OpenDatabase()
     return true;
 }
 
+/**
+ * @brief Get information about the specified product
+ * 
+ * @param infoJson 
+ * @return QJsonObject 
+ */
+QJsonObject DB::productShowMsg(QJsonObject infoJson) {
+    QJsonObject resJson;
+    resJson["type"] = "productShowMsg";
+    QSqlQuery query(db);
+    QString searchStr = "select product_name, price, state, seller_name, description, src from Product where product_Id = '" + infoJson["productId"].toString() + "'";
+    qDebug() << "msg: " << searchStr;
+    bool isSucc = query.exec(searchStr);
+    if(isSucc) {
+        if(query.next()) {
+            resJson["productId"] = infoJson["productId"];
+            resJson["product_name"] = query.value(0).toString();
+            resJson["price"] = query.value(1).toString();
+            resJson["state"] = query.value(2).toString();
+            resJson["seller_name"] = query.value(3).toString();
+            resJson["description"] = query.value(4).toString();
+            resJson["src"] = query.value(5).toString();
+            return resJson;
+        }
+    }
+}
+
+/**
+ * @brief Get information about the product
+ * Get information about the product from the database (commodity ID, name, price, remaining quantity, seller, detailed description of the product and product image address), and return it to the client
+ * @param infoJson 
+ * @return QJsonArray 
+ */
 QJsonArray DB::searchProductInfo(QJsonObject infoJson) {
     QJsonArray productArray;
     QSqlQuery query(db);
@@ -58,11 +101,20 @@ QJsonArray DB::searchProductInfo(QJsonObject infoJson) {
         productJson["description"] = query.value(4).toString();
         productJson["src"] = query.value(5).toString();
         productJson["tag"] = query.value(6).toString();
+        if(infoJson["object"] == "user") {
+            productJson["product_name"] = query.value(9).toString();
+        }
         productArray.append(productJson);
     }
     return productArray;
 }
 
+/**
+ * @brief User login
+ * Query whether the user's login information is correct. If it is not, an error will be reported. If it is correct, query whether someone has logged in at present. If it is, you cannot log in repeatedly
+ * @param infoJson 
+ * @return QJsonObject 
+ */
 QJsonObject DB::isLogon(QJsonObject infoJson) {
     QJsonObject resJson;
     if(infoJson["User_name"] == "" || infoJson["User_pwd"] == "") {
@@ -103,6 +155,12 @@ QJsonObject DB::isLogon(QJsonObject infoJson) {
     return resJson;
 }
 
+/**
+ * @brief Get user's unprocessed order message
+ * 
+ * @param Info 
+ * @return QJsonArray 
+ */
 QJsonArray DB::getUnreadMsg(QJsonObject Info) {
     QJsonArray msgArray;
     QSqlQuery query(db);
@@ -135,6 +193,12 @@ QJsonArray DB::getReadMsg(QJsonObject Info) {
     return msgArray;
 }
 
+/**
+ * @brief Get the data of the product that this user has published
+ * 
+ * @param releaseInfo 
+ * @return QJsonArray 
+ */
 QJsonArray DB::getReleaseInfo(QJsonObject releaseInfo) {
     QSqlQuery query(db);
     QJsonArray res;
@@ -177,6 +241,13 @@ QJsonObject DB::releasePro(QJsonObject releseInfo) {
     return ret;
 }
 
+/**
+ * @brief Update user's picture information
+ * 
+ * @param infoJson 
+ * @return true 
+ * @return false 
+ */
 bool DB::updateImgSrc(QJsonObject infoJson) {
     QSqlQuery query(db);
     QString searchStr = "UPDATE UserInfo SET Img = '" + infoJson["savePath"].toString() + "' WHERE user_name = '" + infoJson["User_name"].toString() + "'";
@@ -191,6 +262,12 @@ bool DB::updateImgSrc(QJsonObject infoJson) {
     }
 }
 
+/**
+ * @brief New user registration
+ * According to the user's registration information, first judge whether the information is complete, then judge whether to use the duplicate name. If all meet the requirements, return true, otherwise, return false
+ * @param infoJson 
+ * @return QString 
+ */
 QString DB::UserRegister(QJsonObject infoJson) {
 //    qDebug() << "name = " << infoJson["User_Name"].toString() << endl;
 //    qDebug() <<  infoJson.size() << endl;
@@ -217,6 +294,13 @@ QString DB::UserRegister(QJsonObject infoJson) {
     }
 }
 
+/**
+ * @brief Determine whether the account name has been logged in
+ * 
+ * @param name 
+ * @return true 
+ * @return false 
+ */
 bool DB::checkLogon(QString name) {
     QSqlQuery query(db);
     QString searchStr = "select isLogon from UserInfo where user_name = '" + name + "'";
@@ -230,6 +314,13 @@ bool DB::checkLogon(QString name) {
     return false;
 }
 
+/**
+ * @brief Get filtered product information
+ * Get the filtered product information according to the keywords given by the user, the sorting order selected on the interface and the category information on the left side of the interface 
+ * 
+ * @param queryInfo 
+ * @return QJsonArray 
+ */
 QJsonArray DB::queryResult(QJsonObject queryInfo) {
     QJsonArray productArray;
     QSqlQuery query(db);
@@ -262,6 +353,11 @@ QJsonArray DB::queryResult(QJsonObject queryInfo) {
     return productArray;
 }
 
+/**
+ * @brief Add the user's login information to the database
+ * 
+ * @param info 
+ */
 void DB::addLogonUser(QJsonObject info) {
     QSqlQuery query(db);
     QString searchStr = "insert into logon values('" + info["User_name"].toString() + "', " + info["seq"].toString() + ")";
@@ -270,6 +366,12 @@ void DB::addLogonUser(QJsonObject info) {
     return ;
 }
 
+/**
+ * @brief Get user's sequence
+ * 
+ * @param info 
+ * @return int 
+ */
 int DB::getSeq(QJsonObject info) {
     QSqlQuery query(db);
     QString searchStr = "select seq from logon where user_name = '" + info["SellerName"].toString() +  "'";
@@ -281,6 +383,11 @@ int DB::getSeq(QJsonObject info) {
     }
 }
 
+/**
+ * @brief New order information needs to be recorded and added to the seller's unprocessed message
+ * 
+ * @param Info 
+ */
 void DB::addUnreadMsg(QJsonObject Info) {
     QSqlQuery query(db);
     QString searchStr = "select count(*) from Unread_Msg";
@@ -295,6 +402,13 @@ void DB::addUnreadMsg(QJsonObject Info) {
     return ;
 }
 
+/**
+ * @brief User logout
+ * When users log out, they need to modify their login status
+ * @param user_name 
+ * @return true 
+ * @return false 
+ */
 bool DB::logout(QString user_name) {
     QSqlQuery query(db);
     QString searchStr = "UPDATE UserInfo SET isLogon = 0 WHERE user_name = '" + user_name + "'";
@@ -308,11 +422,17 @@ bool DB::logout(QString user_name) {
     return false;
 }
 
+/**
+ * @brief Get the user's comments on a specific product
+ * 
+ * @param ProductId 
+ * @return QJsonArray 
+ */
 QJsonArray DB::queryComment(QString ProductId) {
     QJsonArray jsonArray;
     QSqlQuery query(db);
     QString searchStr = "SELECT UserInfo.user_name, comment, Img, popular, Product_Id, Id  FROM UserInfo JOIN comment ON UserInfo.user_name = comment.User_name WHERE Product_Id = '" + ProductId + "' ORDER BY popular desc";
-//    qDebug() << searchStr << endl;
+    qDebug() << searchStr << endl;
     bool isSuccess = query.exec(searchStr);
     if(!isSuccess) {
 //        qDebug() << "No" << endl;
@@ -328,9 +448,15 @@ QJsonArray DB::queryComment(QString ProductId) {
         jsonObject["Id"] = query.value(5).toInt();
         jsonArray.append(jsonObject);
     }
+    qDebug() << jsonArray.size() <<endl;
     return jsonArray;
 }
 
+/**
+ * @brief When the user finishes processing the order, he needs to take the order out of the unprocessed order and put it into the processed order
+ * 
+ * @param Info 
+ */
 void DB::changeUnreadToRead(QJsonObject Info) {
     int Id = Info["Id"].toInt();
     QSqlQuery query(db);
@@ -357,6 +483,12 @@ void DB::changeUnreadToRead(QJsonObject Info) {
     query.exec(searchStr);
 }
 
+/**
+ * @brief Add comment information
+ * 
+ * @param commentJson 
+ * @return QJsonObject 
+ */
 QJsonObject DB::insertComment(QJsonObject commentJson) {
     QJsonObject res;
     res["type"] = "queryComment";
@@ -381,7 +513,11 @@ QJsonObject DB::insertComment(QJsonObject commentJson) {
     }
 }
 
-
+/**
+ * @brief Record user's likes
+ * 
+ * @param praiseJson 
+ */
 void DB::praise(QJsonObject praiseJson) {
     QSqlQuery query(db);
 //    qDebug() << praiseJson["Id"].toInt();

@@ -4,6 +4,7 @@ dealMsg::dealMsg(QJsonObject Info, QTcpSocket* conn)
 {
     QJsonObject infoJson;
     infoJson["type"] = Info["type"];
+    qDebug() << Info["type"].toString();
     if(Info["type"] == "searchProductInfo") {
         QJsonArray infoArray = db.searchProductInfo(Info);
         if(infoArray.size() > 0)  {

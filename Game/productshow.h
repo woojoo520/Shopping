@@ -1,6 +1,13 @@
 #ifndef PRODUCTSHOW_H
 #define PRODUCTSHOW_H
 
+/**
+ * @file
+ * @brief   show the product's detailed information
+ * @author  MengYeqing
+ * @date    2019/11/23
+ * @note
+ */
 #include <QDialog>
 #include <QVector>
 #include <QString>

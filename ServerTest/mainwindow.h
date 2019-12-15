@@ -1,8 +1,16 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
-
+/**
+ * @file mainwindow.h
+ * @author Meng Yeqing
+ * @brief 
+ * @version 0.1
+ * @date 2019-12-15
+ * 
+ * @copyright Copyright (c) 2019
+ * 
+ */
 #include <QMainWindow>
-
 #include <QDebug>
 #include <QThread>
 #include <QtNetwork>

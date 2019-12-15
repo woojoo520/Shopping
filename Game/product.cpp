@@ -1,5 +1,7 @@
 #include "product.h"
-
+/**
+ * @brief initialize the product
+ */
 Product::Product()
 {
     this->product_id = "";

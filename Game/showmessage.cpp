@@ -1,6 +1,9 @@
 #include "showmessage.h"
 #include "ui_showmessage.h"
 
+/**
+ * @brief   init the ui
+ */
 showMessage::showMessage(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::showMessage)
@@ -8,11 +11,17 @@ showMessage::showMessage(QWidget *parent) :
     ui->setupUi(this);
 }
 
+/**
+ * @brief   delete the ui
+ */
 showMessage::~showMessage()
 {
     delete ui;
 }
 
+/**
+ * @brief   Layout, displaying the order information received by the user, including unread and read
+ */
 void showMessage::showMsg() {
     QGridLayout *layout = new QGridLayout;
     QWidget *containWidget = new QWidget;
@@ -60,6 +69,9 @@ void showMessage::showMsg() {
     ui->scrollArea->setWidget(containWidget);
 }
 
+/**
+ * @brief   emit a signal to get the message id in the database
+ */
 void showMessage::getMsgIndex(int id) {
     emit readXmsg(id);
 }

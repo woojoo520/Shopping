@@ -1,6 +1,15 @@
 #ifndef DB_H
 #define DB_H
-
+/**
+ * @file db.h
+ * @author MengYeqing 
+ * @brief 
+ * @version 0.1
+ * @date 2019-12-15
+ * 
+ * @copyright Copyright (c) 2019
+ * 
+ */
 #include <QObject>
 #include <QApplication>
 #include <QSql>
@@ -39,6 +48,7 @@ public:
     QJsonArray getUnreadMsg(QJsonObject Info);
     QJsonArray getReadMsg(QJsonObject Info);
     void changeUnreadToRead(QJsonObject Info);
+    QJsonObject productShowMsg(QJsonObject infoJson);
 signals:
     void sendImg();
     void sendQueryRes(QJsonArray res);

@@ -1,6 +1,11 @@
 #include "register.h"
 #include "ui_register.h"
 
+/**
+ * @brief Construct a new Register:: Register object
+ * Initialization, setting the format of account password
+ * @param parent 
+ */
 Register::Register(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::Register)
@@ -10,6 +15,9 @@ Register::Register(QWidget *parent) :
     ui->resurePwd->setEchoMode(QLineEdit::Password);
 }
 
+/**
+ * @brief Destroy the Register:: Register object
+ */
 Register::~Register()
 {
     delete ui;
@@ -19,6 +27,11 @@ QVector<QString> Register::getInfoMation() {
 
 }
 
+
+/**
+ * @brief Get registered user information and submit to server
+ * get the information of the user's name, password, address, phone number and the logo picture. send a signal to the mainWindow to pass it to server
+ */
 void Register::on_registerBtn_clicked()
 {
     QJsonObject infoJson;
@@ -32,6 +45,10 @@ void Register::on_registerBtn_clicked()
     emit sendInfo(infoJson);
 }
 
+/**
+ * @brief   Open local folder and upload user image
+ * Get the user's local picture as the user's logo image, and display the picture in the logo area
+ */
 void Register::on_logoBtn_clicked()
 {
     fileName = QFileDialog::getOpenFileName(
@@ -50,6 +67,9 @@ void Register::on_logoBtn_clicked()
     }
 }
 
+/**
+ * @brief   Get the picture of logo area and save it in the registration information
+ */
 void Register::SaveImg() {
     QString savePath = "E:\\Qt\\Shopping\\Game\\pic\\UserLogo\\" + ui->User_Name->text() + ".jpg";
     QScreen *screen = QGuiApplication::primaryScreen();

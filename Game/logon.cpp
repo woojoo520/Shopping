@@ -2,6 +2,9 @@
 #include "ui_logon.h"
 #include "string"
 
+/**
+ * \brief the comstructor implements the function of setting password display
+ */
 LogOn::LogOn(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::LogOn)
@@ -15,8 +18,10 @@ LogOn::~LogOn()
     delete ui;
 }
 
-
-
+/**
+ * \brief a login slot function and send a signal of "login"
+ * get the information of ther user's name and password, and send a signal of "login" to mainWindow to pass this request to the server
+ */
 void LogOn::on_LogOn_Btn_clicked()
 {
     QJsonObject Infojson;

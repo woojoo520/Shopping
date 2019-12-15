@@ -1,5 +1,14 @@
 #ifndef MYLABEL_H
 #define MYLABEL_H
+
+/**
+ * @file
+ * @brief   Inherit the QLabel class and implement the click function
+ * @author  MengYeqing
+ * @date    2019/11/20
+ * @note
+ */
+
 #include <QLabel>
 #include <QString>
 #include <QWidget>

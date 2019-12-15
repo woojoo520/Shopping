@@ -1,5 +1,12 @@
 #include "mybutton.h"
 
+/**
+ * @brief init the praise button with id, labelid, seq, productId
+ * @param id        it means the 
+ * @param labelId   it means the  
+ * @param seq       it means the seq is the order in the layout
+ * @param productId it means the comment is of this product(id = productid)
+ */
 myButton::myButton(QWidget *parent, int id, int labelId, int seq, QString productId)
     : QPushButton(parent)
 {
@@ -12,6 +19,12 @@ myButton::myButton(QWidget *parent, int id, int labelId, int seq, QString produc
     isclicked = false;
 }
 
+
+/**
+ * @brief praise one of the comment
+ * @param event a clicked signal 
+ * When the user clicks the icon, it indicates the like operation, and when the user clicks again, it indicates that the like operation is cancelled
+ */
 void myButton::mousePressEvent(QMouseEvent *event) {
     isclicked = !isclicked;
     if(isclicked) {

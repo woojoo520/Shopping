@@ -1,5 +1,12 @@
 #ifndef MESSAGE_H
 #define MESSAGE_H
+/**
+ * @file 
+ * @brief doing nothing?
+ * @author MengYeqing
+ * @date 2019/12/01
+ * @note
+ */
 
 #include <QDialog>
 

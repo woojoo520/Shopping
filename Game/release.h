@@ -1,6 +1,13 @@
 #ifndef RELEASE_H
 #define RELEASE_H
 
+/**
+ * @file
+ * @brief   Users can also release products as sellers
+ * @author  MengYeqing
+ * @date    2019/12/4
+ * @note
+ */
 #include <QDialog>
 #include <QImage>
 #include <QLabel>
