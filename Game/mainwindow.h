@@ -2,12 +2,12 @@
 #define MAINWINDOW_H
 
 /**
- * \file 
- * \brief implement the interaction with server
- * \author MengYeqing
- * \date 2019.12.7
- * \version 1.0
- * \note
+ * @file
+ * @brief implement the interaction with server
+ * @author MengYeqing
+ * @date 2019.12.7
+ * @version 1.0
+ * @note
  * the mainWindow work as a client using TCP/IP to interact with server, sending and receiving data in JSON format, the type field the data represents the type of information the client sent, such as "request for product", "login" and so on.
  */ 
 
@@ -70,6 +70,7 @@ private:
     void showLogon(QJsonObject jsonObject);
     void SaveProductInfo(QJsonArray array, QString type);
     void createProductShow(QJsonObject info);
+    void forcedToLogout();
 
 public:
     explicit MainWindow(QWidget *parent = 0);

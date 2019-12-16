@@ -24,7 +24,7 @@ class dealThread : public QThread, public QRunnable
 public:
     dealThread(QJsonObject Info, QTcpSocket* conn);
     ~dealThread();
-    void dealWithMsg(QJsonObject Info);
+    bool dealWithMsg(QJsonObject Info);
     void run();     // 声明继承于QThread虚函数 run()
 private:
     QTcpSocket* conn;

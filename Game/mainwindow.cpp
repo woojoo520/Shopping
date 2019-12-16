@@ -1,7 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-/*!
+/**
  * @brief initialize the client object and the interface
  * You need to link to the server first. Then you need to get and load the product information from the server and display it on the home page. ANd the most important thing is to complete the connection between signal and slot
  */
@@ -64,7 +64,7 @@ MainWindow::MainWindow(QWidget *parent) :
 //    }
 }
 
-/*!
+/**
  * @brief send the product information to be published to the server 
  * @param productInfo the productInfo's data format is JSON, which including the information of the product, such as product's name, id, price, amount and the description. And the type of the message is "ReleaseProduct", the user name is getting from the mainWindow which pocess of the user infomation
  */
@@ -75,7 +75,7 @@ void MainWindow::releaseProduct(QJsonObject productInfo) {
     send_socketInfo(productInfo);
 }
 
-/*!
+/**
  * @brief send the message to server to require the picture src of the product 
  * @param infoJson the inforJson includin the product Id
  */
@@ -83,7 +83,7 @@ void MainWindow::updateImgSrc(QJsonObject infoJson) {
     send_socketInfo(infoJson);
 }
 
-/*!
+/**
  * @brief send data to the server
  * @param infoJson the data format of the parameter is JSON, and the type field determining the content of the message to the server, also determining how the server interprets this information
  * if the message is sent successfully, it will show nothing, others, it will show a warning message box
@@ -99,7 +99,7 @@ void MainWindow::send_socketInfo(QJsonObject infoJson) {
     }
 }
 
-/*!
+/**
  * @brief connect to the server
  * the function is to connect to the server which IP address and the port is fixed. If connect failed, it will show you a warning message box, ot, you will see "connected successfully!"
  */
@@ -111,8 +111,12 @@ void MainWindow::connect_socket()
     //连接服务器
     socket->connectToHost("127.0.0.1",23333);
     while(!socket->waitForConnected(3000)) {
-        QMessageBox::warning(this, "warning", "连接失败");
-        socket->connectToHost("127.0.0.1",23333);
+        QMessageBox::StandardButton r = QMessageBox::question(this, "warning", "连接失败，还要继续连接吗?", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+        if(r == QMessageBox::Yes) {
+            socket->connectToHost("127.0.0.1",23333);
+        } else {
+            return ;
+        }
     }
     QMessageBox::warning(this,"warning",tr("连接服务器成功"),QMessageBox::Yes,QMessageBox::No);
 //    if(!socket->waitForConnected(3000)) {
@@ -124,7 +128,7 @@ void MainWindow::connect_socket()
 //    }
 }
 
-/*!
+/**
  * @brief save the information of the product info which is to be shown on the home page
  * @param array
  * @param type  if the type is user, it means that the information should be save in the mainWindow to be shown in the home page, or it means that the information of the product is the product you relase, it should be saved in the releaseProduct vector
@@ -157,7 +161,7 @@ void MainWindow::SaveProductInfo(QJsonArray array, QString type) {
 
 }
 
-/*!
+/**
  * @brief read data in the buffer
  * 
  * we should infer the message type and find the correct way to interpret teh message
@@ -188,7 +192,8 @@ void MainWindow::socket_Read_Data() {
             }
             showmsg.readMsg = jsonObject["readMsg"].toArray();
         } else {
-            QMessageBox::warning(this, "warning", jsonObject["warning"].toString());
+//            QMessageBox::warning(this, "warning", jsonObject["warning"].toString());
+            forcedToLogout();
         }
     }
     /// if the type is "searchProductInfo", it shows that the information is 
@@ -264,7 +269,7 @@ void MainWindow::socket_Read_Data() {
     }
 }
 
-/*!
+/**
  * @brief change the logo picture of the user if the user login successfully
  */
 void MainWindow::changeLogOnPic() {
@@ -275,14 +280,14 @@ void MainWindow::changeLogOnPic() {
     ui->picLabel->setPixmap(QPixmap::fromImage(newImg));
 }
 
-/*!
+/**
  * @brief get the product information to be shown in the home page
  */
 void MainWindow::initDB() {
     getData();
 }
 
-/*!
+/**
  * @brief add the category button in the home page to select the product the user want
  */
 void MainWindow::initBtnGroup() {
@@ -291,7 +296,7 @@ void MainWindow::initBtnGroup() {
     buttonGroup->addButton(ui->category3, 2);
     buttonGroup->addButton(ui->category4, 3);
 }
-/*!
+/**
  * @brief initialize the combobox to add some options about user selection, such as price, new and old, and other filter conditions
  */
 // 初始化ComboBox
@@ -303,7 +308,7 @@ void MainWindow::init_Combobox() {
     ui->chooseBox->addItem("筛选");
 }
 
-/*!
+/**
  * initialize the scrollbar
  */
 void MainWindow::setScrollBar() {
@@ -319,7 +324,7 @@ void MainWindow::productShowMsg(int i, QString productId) {
     send_socketInfo(showMsg);
 }
 
-/*!
+/**
  * @brief initialize the product information of the home page
  * Display the product information in the middle of the interface and display it in the specific layout. It will show the product picture, description, and the price. If you click the product picture, you will see detail information about the product 
  */
@@ -362,7 +367,7 @@ void MainWindow::showRecommend() {
 
 }
 
-/*!
+/**
  * @brief create an interface to show the product
  * @param i the label index of the product 
  * @param productId the id of the product 
@@ -389,14 +394,14 @@ void MainWindow::createProductShow(QJsonObject info) {
     connect(c, SIGNAL(sendPraise(QJsonObject)), this, SLOT(sendPraise(QJsonObject)));
 }
 
-/*!
+/**
  * @brief send the message to the server that the user "thumb-up" to one of the comment
  */
 void MainWindow::sendPraise(QJsonObject praiseJson) {
     send_socketInfo(praiseJson);
 }
 
-/*!
+/**
  * @brief send the comment of the product to server
  * when the user is not login, he or she will be forced to login before comment. If the user is login successfully, he or she can comment the product 
  */
@@ -410,7 +415,7 @@ void MainWindow::sendComment(QJsonObject commentJson) {
     send_socketInfo(commentJson);
 }
 
-/*!
+/**
  * @brief send the message to told the server that the user has dealed with the order 
  * @param id the id of the unread message
  */
@@ -421,7 +426,7 @@ void MainWindow::getMsgIndex(int id) {
     send_socketInfo(msgJson);
 }
 
-/*!
+/**
  * @brief get the comment of the product
  * @param labelId the id of the product label 
  * @param productId the id of the product 
@@ -435,7 +440,7 @@ void MainWindow::getComment(int labelId, QString productId) {
     send_socketInfo(InfoJson);
 }
 
-/*!
+/**
  * @param get the information of teh product from the database
  */
 // 从数据库获取Product信息
@@ -446,7 +451,7 @@ void MainWindow::getData() {
     send_socketInfo(Infojson);
 }
 
-/*!
+/**
  * @brief return the information to user about the product information
  */
 // 将获取的产品信息返回给用户
@@ -454,7 +459,7 @@ QVector<Product> MainWindow::getProductInfo() {
     return ProductInfo;
 }
 
-/*!
+/**
  * @brief debug, show the product information which is sent from the server
  */
 void MainWindow::PrintProductInfo() {
@@ -464,7 +469,7 @@ void MainWindow::PrintProductInfo() {
     qDebug() << endl;
 }
 
-/*!
+/**
  * @brief deconstruction of the mainWindow
  * if the user iis still login, then it will send a message to logout the user
  */
@@ -478,7 +483,7 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-/*!
+/**
  * @brief get the information if the product that the user want after adding some restriction and send the request to server
  */
 void MainWindow::on_searchBtn_clicked()
@@ -513,7 +518,7 @@ void MainWindow::on_searchBtn_clicked()
     send_socketInfo(query);
 }
 
-/*!
+/**
  * @brief basing on the product vector, show the information about the product in the recomment module
  */
 void MainWindow::showQueryRes(QVector<Product> productRes) {
@@ -521,7 +526,7 @@ void MainWindow::showQueryRes(QVector<Product> productRes) {
     showRecommend();
 }
 
-/*!
+/**
  * @brief send the request of getting the message to server
  */ 
 void MainWindow::on_messageBtn_clicked()
@@ -546,7 +551,7 @@ void MainWindow::on_MyBtn_clicked()
     mydialog.show();
 }
 
-/*!
+/**
  * @brief show the release interface
  * if the user is not login, then the user should be forced to login, and release the product after.
  */
@@ -565,7 +570,7 @@ void MainWindow::on_releaseBtn_clicked()
     release.show();
 }
 
-/*!
+/**
  * @brief after you click the home page button, it will be reset
  */
 void MainWindow::on_firstPageBtn_clicked()
@@ -574,7 +579,7 @@ void MainWindow::on_firstPageBtn_clicked()
     showRecommend();
 }
 
-/*!
+/**
  * @brief show the login interface and change the button's text to "logout" or "login" 
  */
 void MainWindow::on_LogonBtn_clicked()
@@ -590,28 +595,28 @@ void MainWindow::on_LogonBtn_clicked()
     }
 }
 
-/*!
+/**
  * hide the login interface
  */
 void MainWindow::hideLogOn() {
     logon.hide();
 }
 
-/*!
+/**
  * show the register interface
  */
 void MainWindow::showRegister() {
     registerW.show();
 }
 
-/*!
+/**
  * @brief send the register information to server 
  */
 void MainWindow::getUserLogon(QJsonObject Infojson) {
     send_socketInfo(Infojson);
 }
 
-/*!
+/**
  * @brief change the logo
  */
 void MainWindow::showLogon(QJsonObject jsonObject) {
@@ -639,4 +644,10 @@ void MainWindow::connDisconnected() {
 //    ui->textEdit->setText("链接丢失");
     QMessageBox::warning(this, "warning", "Disconnect");
     connect_socket();
+}
+
+void MainWindow::forcedToLogout() {
+    QMessageBox::warning(this, "warning", "您的账号已经在其他地方登陆，您被强制下线");
+    ui->userName_label->setText("");
+    changeLogOnPic();
 }

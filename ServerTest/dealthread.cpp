@@ -38,7 +38,7 @@ void dealThread::run() {
  * 
  * @param Info 
  */
-void dealThread::dealWithMsg(QJsonObject Info) {
+bool dealThread::dealWithMsg(QJsonObject Info) {
     QJsonObject infoJson;
     infoJson["type"] = Info["type"];
     if(Info["type"] == "searchProductInfo") {
@@ -144,7 +144,18 @@ void dealThread::dealWithMsg(QJsonObject Info) {
     } else if(Info["type"] == "productShowMsg") {
         QJsonObject infoJson = db.productShowMsg(Info);
         sendInfo = QJsonDocument(infoJson).toJson();
+    } else if(Info["type"] == "rearr_Unread") {
+        db.rearrangeUnreadId();
+        return false;
+    } else if(Info["type"] == "rearr_Read") {
+        db.rearrangeReadId();
+        return false;
     }
+//    else if(Info["type"] == "del_Invalid") {
+//        db.delInvalidId();
+//        return false;
+//    }
+    return true;
 
 }
 

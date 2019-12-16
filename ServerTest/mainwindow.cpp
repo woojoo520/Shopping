@@ -85,11 +85,35 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::on_rearr_Unread_Btn_clicked()
+{
+    auto conn = qobject_cast<QTcpSocket*>(server);
+    QJsonObject Info;
+    Info["type"] = "rearr_Unread";
+    dealThread *thread = new dealThread(Info, conn);
+    connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
+    pool.start(thread);
+}
+
+void MainWindow::on_rearr_Read_Btn_clicked()
+{
+    auto conn = qobject_cast<QTcpSocket*>(server);
+    QJsonObject Info;
+    Info["type"] = "rearr_Read";
+    dealThread *thread = new dealThread(Info, conn);
+    connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
+    pool.start(thread);
+}
 
 
 
-
-
-
-
+void MainWindow::on_del_Invalid_Btn_clicked()
+{
+//    auto conn = qobject_cast<QTcpSocket*>(server);
+//    QJsonObject Info;
+//    Info["type"] = "del_Invalid";
+//    dealThread *thread = new dealThread(Info, conn);
+//    connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
+//    pool.start(thread);
+}
 

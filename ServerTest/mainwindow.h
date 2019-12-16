@@ -43,6 +43,12 @@ private slots:
     void newConn();
     void dataArrived();
 
+    void on_rearr_Unread_Btn_clicked();
+
+    void on_rearr_Read_Btn_clicked();
+
+    void on_del_Invalid_Btn_clicked();
+
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();

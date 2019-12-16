@@ -49,6 +49,9 @@ public:
     QJsonArray getReadMsg(QJsonObject Info);
     void changeUnreadToRead(QJsonObject Info);
     QJsonObject productShowMsg(QJsonObject infoJson);
+    void rearrangeUnreadId();   // 重新设置未读消息的id号
+    void rearrangeReadId();     // 重新设置已读消息的id号
+    void delInvalidId();        // 删除失效商品
 signals:
     void sendImg();
     void sendQueryRes(QJsonArray res);

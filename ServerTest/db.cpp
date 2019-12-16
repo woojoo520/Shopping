@@ -129,7 +129,8 @@ QJsonObject DB::isLogon(QJsonObject infoJson) {
         query.exec(str);
         if(query.next()) {
             if(query.value(5).toString() == "1") {
-                resJson["warning"] = "Sorry, the user has been signed in!";
+//                resJson["warning"] = "Sorry, the user has been signed in!";
+                resJson["warning"] = "Sorry, your account has been logged in elsewhere, you are forced to go offline";
             } else {
                 QSqlQuery query2(db);
                 QString searchStr2 = "UPDATE UserInfo SET isLogon = 1 WHERE user_name = '" + infoJson["User_name"].toString() + "'";
@@ -530,4 +531,25 @@ void DB::praise(QJsonObject praiseJson) {
 //    qDebug() << searchStr;
     query.exec(searchStr);
 
+}
+
+void DB::rearrangeUnreadId() {
+    QSqlQuery query(db);
+    QString searchStr("EXEC RearrangeUnread");
+    query.exec(searchStr);
+}
+
+void DB::rearrangeReadId() {
+    QSqlQuery query(db);
+    QString searchStr("EXEC RearrangeRead");
+    bool isSucc = query.exec(searchStr);
+    if(!isSucc) {
+        qDebug() << "Failed" << endl;
+    }
+}
+
+void DB::delInvalidId() {
+    QSqlQuery query(db);
+    QString searchStr("EXEC DelInvalidId");
+    query.exec(searchStr);
 }
