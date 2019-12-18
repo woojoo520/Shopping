@@ -7,6 +7,7 @@
 QT       += core gui
 QT       += network
 QT       += sql
+LIBS     += -pthread
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -31,16 +32,14 @@ SOURCES += \
     serverconnect.cpp \
     dealthread.cpp \
     product.cpp \
-    db.cpp \
-    dealmsg.cpp
+    db.cpp
 
 HEADERS += \
         mainwindow.h \
     serverconnect.h \
     dealthread.h \
     product.h \
-    db.h \
-    dealmsg.h
+    db.h
 
 FORMS += \
         mainwindow.ui

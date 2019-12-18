@@ -15,6 +15,13 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(server, &QTcpServer::newConnection, this, &MainWindow::newConn);
     listen(QHostAddress::Any, 23333);
     pool.setMaxThreadCount(1000);
+
+
+    QString localHostName = QHostInfo::localHostName();
+    qDebug() << "localHostName: " << localHostName;
+    QHostInfo info = QHostInfo::fromName(localHostName);
+    qDebug() << "IP Address: " << info.addresses();
+
 }
 
 /**
@@ -52,7 +59,6 @@ void MainWindow::newConn() {
     qDebug() << "connection established: " << socks.back() << "\n";
     connect(socks.back(), &QTcpSocket::readyRead, this, &MainWindow::dataArrived);
     connect(socks.back(), &QTcpSocket::disconnected, this, &MainWindow::connDisconnected);
-
 }
 
 /**
@@ -62,18 +68,52 @@ void MainWindow::newConn() {
  */
 void MainWindow::dataArrived() {
     auto conn = qobject_cast<QTcpSocket*>(sender());
-//    QString str = conn->readAll();
     buffer = conn->readAll();
     qDebug() << "Request from " << conn << endl;
 
     Info = QJsonDocument::fromBinaryData(buffer).object();
     ui->receiveEdit->setText(QString(QJsonDocument(Info).toJson(QJsonDocument::Compact)));
 
+
     dealThread *thread = new dealThread(Info, conn);
     connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
+    connect(thread, &dealThread::forceLogOut, this, &MainWindow::forceLogoutUser);
+    connect(thread, &dealThread::addUserToMap, this, &MainWindow::addUserToMap);
 //    thread->start();
-    pool.start(thread);
+    thread->start();
+//    pool.start(thread);
 
+}
+
+void MainWindow::addUserToMap(QString user_name, QTcpSocket* socket) {
+    QMessageBox::warning(this, "warning", "addUserToMap");
+    user_socket.insert(user_name, socket);
+    return ;
+}
+
+void MainWindow::forceLogoutUser(QString user_name, QTcpSocket* socket, QJsonObject user_out, QJsonObject user_in) {
+//    QMessageBox::warning(this, "warning", "forceLogoutUser");
+    qDebug() << "size = " << user_socket.size() << endl;
+    qDebug() << user_name << endl;
+    if(user_socket.find(user_name) != user_socket.end()) {
+        qDebug() << "******************************" << endl;
+        qDebug() << user_out << endl;
+        qDebug() << "******************************" << endl;
+        qDebug() << user_in << endl;
+
+        qint64 writeResult = user_socket.value(user_name)->write(QJsonDocument(user_out).toJson());
+        bool BoolFlush = user_socket.value(user_name)->flush();
+        if(writeResult != -1 && BoolFlush == 1) {
+            //返回值不为-1，则发送数据成功
+            if(writeResult == 0) {
+                qDebug() << "发送成功" << endl;
+            }
+        }
+        user_socket.remove(user_name);
+        user_socket.insert(user_name, socket);
+        return ;
+    }
+    return ;
 }
 
 /**
@@ -92,7 +132,8 @@ void MainWindow::on_rearr_Unread_Btn_clicked()
     Info["type"] = "rearr_Unread";
     dealThread *thread = new dealThread(Info, conn);
     connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
-    pool.start(thread);
+    thread->start();
+//    pool.start(thread);
 }
 
 void MainWindow::on_rearr_Read_Btn_clicked()
@@ -102,7 +143,8 @@ void MainWindow::on_rearr_Read_Btn_clicked()
     Info["type"] = "rearr_Read";
     dealThread *thread = new dealThread(Info, conn);
     connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
-    pool.start(thread);
+    thread->start();
+//    pool.start(thread);
 }
 
 

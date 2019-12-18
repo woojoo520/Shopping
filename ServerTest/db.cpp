@@ -115,10 +115,14 @@ QJsonArray DB::searchProductInfo(QJsonObject infoJson) {
  * @param infoJson 
  * @return QJsonObject 
  */
-QJsonObject DB::isLogon(QJsonObject infoJson) {
-    QJsonObject resJson;
+QPair<QJsonObject, QJsonObject> DB::isLogon(QJsonObject infoJson) {
+    // 如果两个账号同时登录，则resJson1是发给第一个账号的，resJson是发给第二个账号的
+    // 如果只有一个账号登录，则resJosn1发给这个用户
+    QJsonObject resJson1;
+    QJsonObject resJson2;
+    bool isLogin = false;
     if(infoJson["User_name"] == "" || infoJson["User_pwd"] == "") {
-        resJson["warning"] = "Sorry, Please complete the infomation";
+        resJson1["warning"] = "Sorry, Please complete the infomation";
 //        resInfo.push_back("Sorry, Please complete the infomation");
     } else {
         QString name =infoJson["User_name"].toString();
@@ -127,33 +131,62 @@ QJsonObject DB::isLogon(QJsonObject infoJson) {
 //        qDebug() << str << endl;
         QSqlQuery query(db);
         query.exec(str);
+        /*
+         * 这里的返回值设置几个状态
+         * state = 0，表示该用户已经登陆了，另一端需要强制退出, 此时需要告诉人名，然后切断另一端原有的链接，然后加入新的连接
+         * state = 1，表示正常登录，没有任何异常
+         * state = 2，表示数据库查询出现了问题
+         * state = 3，表示用户密码出现错误
+         */
         if(query.next()) {
-            if(query.value(5).toString() == "1") {
-//                resJson["warning"] = "Sorry, the user has been signed in!";
-                resJson["warning"] = "Sorry, your account has been logged in elsewhere, you are forced to go offline";
+            qDebug() << query.value(0).toString() << " " << query.value(1).toString() << " " << query.value(2).toString() << " " << query.value(3).toString() << " " << query.value(4).toString() << " " <<query.value(5).toInt() << endl;
+            if(query.value(5).toInt() == 1) {
+                qDebug() <<  "Sorry, the user has been signed in!";
+                resJson1["warning"] = "Sorry, your account has been logged in elsewhere, you are forced to go offline";
+                resJson1["state"] = 0;
+                resJson1["usr_name"] = infoJson["User_name"];
+                isLogin = true;
+            }
+            // 如果有两个用户同时登录的话
+            if(isLogin) {
+                resJson2["state"] = 1;
+                resJson2["warning"] = "Logon Successfully!";
+                resJson2["usr_logo"] = query.value(4).toString();
+                resJson2["usr_name"] = infoJson["User_name"];
+                // 登录成功的时候需要查看一下当前是否有消息，如果有则需要将消息返回
+                resJson2["readMsg"] = getReadMsg(infoJson);
+                resJson2["unreadMsg"] = getUnreadMsg(infoJson);
             } else {
                 QSqlQuery query2(db);
                 QString searchStr2 = "UPDATE UserInfo SET isLogon = 1 WHERE user_name = '" + infoJson["User_name"].toString() + "'";
-//                qDebug() << searchStr2 << endl;
+    //                qDebug() << searchStr2 << endl;
                 bool isSuccess = query2.exec(searchStr2);
                 if(isSuccess) {
                     addLogonUser(infoJson);
-                    resJson["warning"] = "Logon Successfully!";
-                    resJson["usr_logo"] = query.value(4).toString();
-                    resJson["usr_name"] = infoJson["User_name"];
+                    resJson1["warning"] = "Logon Successfully!";
+                    resJson1["usr_logo"] = query.value(4).toString();
+                    resJson1["usr_name"] = infoJson["User_name"];
                     // 登录成功的时候需要查看一下当前是否有消息，如果有则需要将消息返回
-                    resJson["readMsg"] = getReadMsg(infoJson);
-                    resJson["unreadMsg"] = getUnreadMsg(infoJson);
+                    resJson1["readMsg"] = getReadMsg(infoJson);
+                    resJson1["unreadMsg"] = getUnreadMsg(infoJson);
+                    resJson1["state"] = 1;
 
                 } else {
-                    resJson["warning"] = "Sorry, Logon failed!";
+                    resJson1["warning"] = "Sorry, Logon failed!";
+                    resJson1["state"] = 2;
                 }
             }
         } else {
-            resJson["warning"] = "Sorry, your password is wrong";
+            resJson1["warning"] = "Sorry, your password is wrong";
+            resJson1["state"] = 3;
         }
     }
-    return resJson;
+    qDebug() << "**************in db****************" << endl;
+    qDebug() << resJson1 << endl;
+    qDebug() << "******************************" << endl;
+    qDebug() << resJson2 << endl;
+    QPair<QJsonObject, QJsonObject> res(resJson1, resJson2);
+    return res;
 }
 
 /**
@@ -203,7 +236,7 @@ QJsonArray DB::getReadMsg(QJsonObject Info) {
 QJsonArray DB::getReleaseInfo(QJsonObject releaseInfo) {
     QSqlQuery query(db);
     QJsonArray res;
-    QString searchStr = "SELECT P.product_id, .src, P.price, P.description, S.quantity\
+    QString searchStr = "SELECT P.product_id, P.src, P.price, P.description, S.quantity, P.product_name\
                          FROM Seller_product AS S JOIN Product AS P ON S.product_id = P.product_id\
                          WHERE S.SellerName = \'" + releaseInfo["User_name"].toString() + "\'";
     query.exec(searchStr);
@@ -213,6 +246,7 @@ QJsonArray DB::getReleaseInfo(QJsonObject releaseInfo) {
         productJson["price"] = query.value(1).toFloat();
         productJson["description"] = query.value(2).toString();
         productJson["quantity"] = query.value(3).toInt();
+        productJson["name"] = query.value(5).toString();
         res.push_back(productJson);
     }
     return res;
@@ -227,11 +261,12 @@ QJsonObject DB::releasePro(QJsonObject releseInfo) {
     if(query.next()) {
         ID = query.value(0).toInt();
     }
-
-    searchStr = "insert into Product values('" + QString::number(ID + 1) + "', '" + releseInfo["seller_name"].toString() + "', " + QString::number(releseInfo["quantity"].toString().toInt()) + ", " + QString::number(releseInfo["price"].toString().toFloat()) + ", '" + releseInfo["discription"].toString() + "', '" + releseInfo["src"].toString() + "', '" + releseInfo["tag"].toString() + "', 0, NULL)";
-//    qDebug() << searchStr;
+    qDebug() << "************************in release product************************" << endl;
+    searchStr = "insert into Product values('" + QString::number(ID + 1) + "', '" + releseInfo["seller_name"].toString() + "', " + QString::number(releseInfo["quantity"].toString().toInt()) + ", " + QString::number(releseInfo["price"].toString().toFloat()) + ", '" + releseInfo["discription"].toString() + "', '" + releseInfo["src"].toString() + "', '" + releseInfo["tag"].toString() + "', 0, GETDATE(), '" + releseInfo["name"].toString() + "')";
+    qDebug() << searchStr;
     bool isSucc1 = query.exec(searchStr);
     searchStr = "insert into Seller_product values('" + releseInfo["seller_name"].toString() +"', '" + QString::number(ID + 1) + "', " + QString::number(releseInfo["quantity"].toInt()) + ")";
+    qDebug() << searchStr;
     bool isSucc2 = query.exec(searchStr);
 //    qDebug() <<searchStr << endl;
     if(isSucc1 && isSucc2) {
@@ -334,7 +369,8 @@ QJsonArray DB::queryResult(QJsonObject queryInfo) {
         searchStr += "WHERE description LIKE '%" + queryInfo["catogary"].toString() + "%' OR tag LIKE '%" + queryInfo["catogary"].toString() + "%'";
     }
     searchStr += " ORDER BY price " + priceDesc + ", date " + newDesc + ", popular ASC";
-//    qDebug() << searchStr << endl;
+    qDebug() << "***********************in queryResult*********************" << endl;
+    qDebug() << searchStr << endl;
     bool isSucc = query.exec(searchStr);
     if(!isSucc) {
 //        qDebug() << "failed!" << endl;

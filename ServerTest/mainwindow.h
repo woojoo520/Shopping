@@ -22,10 +22,10 @@
 #include <QJsonObject>
 #include <QMap>
 #include <QThreadPool>
+#include <QHostInfo>
 
 #include "serverconnect.h"
 #include "dealthread.h"
-#include "dealmsg.h"
 
 class ServerConnect;
 
@@ -48,12 +48,17 @@ private slots:
     void on_rearr_Read_Btn_clicked();
 
     void on_del_Invalid_Btn_clicked();
-
+//public slots:
+    void forceLogoutUser(QString user_name, QTcpSocket* socket, QJsonObject user_out, QJsonObject user_in);
+    void addUserToMap(QString user_name, QTcpSocket* socket);
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
     bool listen(const QHostAddress &address = QHostAddress::Any, quint16 port = 0);
     void dealWithMsg(QJsonObject Info);
+
+//    void forceLogoutUser(QString user_name, QTcpSocket* socket, QJsonObject user_out, QJsonObject user_in);
+//    void addUserToMap(QString user_name, QTcpSocket* socket);
 
 private:
     Ui::MainWindow *ui;
@@ -65,7 +70,7 @@ private:
     QByteArray buffer;
     QJsonObject Info;
     QThreadPool pool;
-
+    QMap<QString, QTcpSocket*> user_socket;
 };
 
 #endif // MAINWINDOW_H

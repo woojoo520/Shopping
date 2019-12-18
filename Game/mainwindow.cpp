@@ -173,7 +173,7 @@ void MainWindow::socket_Read_Data() {
     buffer = socket->readAll();
     //显示缓冲区数据
     QJsonObject jsonObject = QJsonDocument::fromJson(buffer).object();
-//    ui->textEdit->setText(QString(QJsonDocument(jsonObject).toJson()));
+    ui->textEdit->setText(QString(QJsonDocument(jsonObject).toJson()));
 //    QMessageBox::warning(this, "warning", QString(QJsonDocument(jsonObject).toJson()));
 
     /// if the type is "isLogon", it shows that whether the user login successfully or not, if the user login successfully, the message will include the logo of the user, the meassge(including the read message and the unread message) of the user,  and other information about the user, what the client terminal should do is load the logo of the user, and the button shouldn't be login anymore, but the logout. if the user's login is not successful, then the user should reinput the user name and password adn send the login message again to the server
@@ -192,8 +192,9 @@ void MainWindow::socket_Read_Data() {
             }
             showmsg.readMsg = jsonObject["readMsg"].toArray();
         } else {
-//            QMessageBox::warning(this, "warning", jsonObject["warning"].toString());
-            forcedToLogout();
+            if(jsonObject["User_name"].toString().toInt() == 0) {
+                forcedToLogout();
+            }
         }
     }
     /// if the type is "searchProductInfo", it shows that the information is 

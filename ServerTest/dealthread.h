@@ -16,22 +16,30 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 #include <QJsonArray>
-#include <QRunnable>
+//#include <QRunnable>
+#include <QtCore>
 #include "db.h"
 
-class dealThread : public QThread, public QRunnable
+class dealThread : public QThread
 {
+    Q_OBJECT
 public:
-    dealThread(QJsonObject Info, QTcpSocket* conn);
+    explicit dealThread(QJsonObject Info, QTcpSocket* conn);
     ~dealThread();
-    bool dealWithMsg(QJsonObject Info);
+//    bool dealWithMsg(QJsonObject Info);
     void run();     // 声明继承于QThread虚函数 run()
+signals:
+    void forceLogOut(QString user_name, QTcpSocket* conn, QJsonObject user_out, QJsonObject user_in);
+    void addUserToMap(QString user_name, QTcpSocket* conn);
+//    void resultReady(const QString &s);
+
 private:
     QTcpSocket* conn;
-
     QJsonObject Info;
     QByteArray sendInfo;
     DB db;
 };
+
+
 
 #endif // DEALTHREAD_H

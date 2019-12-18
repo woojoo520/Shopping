@@ -34,7 +34,7 @@ public:
     QJsonArray searchProductInfo(QJsonObject infoJson);
     bool OpenDatabase();
     QString UserRegister(QJsonObject infoJson);
-    QJsonObject isLogon(QJsonObject infoJson);
+    QPair<QJsonObject, QJsonObject> isLogon(QJsonObject infoJson);
     bool logout(QString user_name);
     QJsonArray queryComment(QString ProductId);
     QJsonObject insertComment(QJsonObject commentJson);

@@ -72,6 +72,7 @@ void Release::on_releaseBtn_clicked()
     productInfo["price"] = ui->price_Edit->text();
     productInfo["tag"] = ui->tag_Edit->toPlainText();
     productInfo["src"] = fileName;
+    productInfo["name"] = ui->productName_Edit->text();
 
     QMessageBox::warning(this, "warning", productInfo["quantity"].toString() + " " + QString::number(productInfo["price"].toString().toFloat()));
 
@@ -83,6 +84,12 @@ void Release::on_releaseBtn_clicked()
         return ;
     }
     emit releasePro(productInfo);
+
+    ui->productName_Edit->clear();
+    ui->discription_Edit->clear();
+    ui->quantity_Box->clearMask();
+    ui->tag_Edit->clear();
+    ui->price_Edit->clear();
 }
 
 /**

@@ -2,24 +2,25 @@
 
 /**
  * @brief Construct a new deal Thread::deal Thread object
- * 
- * @param Info 
- * @param conn 
+ *
+ * @param Info
+ * @param conn
  */
-dealThread::dealThread(QJsonObject Info, QTcpSocket* conn)
+dealThread::dealThread(QJsonObject Info, QTcpSocket* conn) : Info(Info), conn(conn)
 {
     this->conn = conn;
     this->Info = Info;
-    dealWithMsg(Info);
+//    dealWithMsg(Info);
 
-    qDebug() << QJsonDocument::fromJson(sendInfo).object();
+//    qDebug() << QJsonDocument::fromJson(sendInfo).object();
 
-    this->conn->write(sendInfo);
+//    this->conn->write(sendInfo);
 }
+
 
 /**
  * @brief Destroy the deal Thread::deal Thread object
- * 
+ *
  */
 dealThread::~dealThread() {
     qDebug() << "析构" << endl;
@@ -27,18 +28,10 @@ dealThread::~dealThread() {
 
 /**
  * @brief run a thread
- * 
+ *
  */
 void dealThread::run() {
-    qDebug() << "Sending reply" << endl;
-}
-
-/**
- * @brief Process the information sent from the client, and call different functions to process according to the information in the type field
- * 
- * @param Info 
- */
-bool dealThread::dealWithMsg(QJsonObject Info) {
+    bool isSend = true;
     QJsonObject infoJson;
     infoJson["type"] = Info["type"];
     if(Info["type"] == "searchProductInfo") {
@@ -52,9 +45,21 @@ bool dealThread::dealWithMsg(QJsonObject Info) {
         infoJson["object"] = Info["object"];
         sendInfo = QJsonDocument(infoJson).toJson();
     } else if(Info["type"] == "isLogon") {
-        QJsonObject infoJson = db.isLogon(Info);
-        infoJson["type"] = "isLogon";
-        sendInfo = QJsonDocument(infoJson).toJson();
+        QPair<QJsonObject, QJsonObject> pairInfo = db.isLogon(Info);
+        pairInfo.first["type"] = "isLogon";
+        pairInfo.second["type"] = "isLogon";
+
+
+        sendInfo = QJsonDocument(pairInfo.first).toJson();
+        // 如果已经有人登录,需要emit两条消息
+        if(pairInfo.first["state"].toInt() == 0) {
+            emit forceLogOut(pairInfo.first["usr_name"].toString(), this->conn, pairInfo.first, pairInfo.second);
+            sendInfo = QJsonDocument(pairInfo.second).toJson();
+        } else if(pairInfo.first["state"].toInt() == 1){
+            emit addUserToMap(pairInfo.first["usr_name"].toString(), this->conn);
+        }
+
+
     } else if(Info["type"] == "UserRegister") {
         QString str = db.UserRegister(Info);
         if(str == "successfully") {
@@ -146,16 +151,23 @@ bool dealThread::dealWithMsg(QJsonObject Info) {
         sendInfo = QJsonDocument(infoJson).toJson();
     } else if(Info["type"] == "rearr_Unread") {
         db.rearrangeUnreadId();
-        return false;
+        isSend = false;
     } else if(Info["type"] == "rearr_Read") {
         db.rearrangeReadId();
-        return false;
+        isSend = false;
     }
-//    else if(Info["type"] == "del_Invalid") {
-//        db.delInvalidId();
-//        return false;
-//    }
-    return true;
 
+    if(isSend) {
+        qDebug() << QJsonDocument::fromJson(sendInfo).object();
+        qint64 writeResult = this->conn->write(sendInfo);
+        bool BoolFlush = this->conn->flush();
+        if(writeResult != -1 && BoolFlush == 1) {
+            //返回值不为-1，则发送数据成功
+            if(writeResult == 0) {
+                qDebug() << "发送成功" << endl;
+            }
+        }
+    }
+    qDebug() << "conn = " << this->conn;
+    qDebug() << "Sending reply" << endl;
 }
-
